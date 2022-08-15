@@ -6,7 +6,7 @@ on:
         description: commit id
         required: true
 jobs:
-  comment:
+  approve_pipelines:
     runs-on: ubuntu-latest
     steps:
       - name: find all waiting pipelines
@@ -18,4 +18,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.repository_name }}
+          REPO: ${{ github.event.repository.name }}
