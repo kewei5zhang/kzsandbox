@@ -30,7 +30,7 @@ jobs:
           for build in $(gh workflow list --all -R $OWNER/$REPO | grep -E '\brelease' | awk '{print $1}'); 
           do 
             RUN_ID=$(gh run list -R $OWNER/$REPO -w $build --json name,headSha,status,url,databaseId --jq '.[] | select((.headSha == '\"${{ inputs.commitId }}\"') and (.status == "waiting")) | .databaseId')
-            [[ ! -z "$RUN_ID" ]] && gh deploy --env prod --run-id $RUN_ID --repo $OWNER/$REPO --approve
+            [[ ! -z "$RUN_ID" ]] && gh deploy --env Production --run-id $RUN_ID --repo $OWNER/$REPO --approve
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
