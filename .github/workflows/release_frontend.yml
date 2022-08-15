@@ -3,14 +3,14 @@ on: [push]
 
 jobs:
   deploy_to_frontend:
-    name: Deploy Indexers to Mainnet
+    name: Deploy to Mainnet
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Wait for tests to succeed
       uses: lewagon/wait-on-check-action@v1.0.0
       with:
-        ref: ${{ github.sha }}
+        ref: ${{ github.ref }}
         check-name: build_docker_image
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         wait-interval: 10
