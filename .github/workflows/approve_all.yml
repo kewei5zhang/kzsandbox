@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: find all waiting pipelines
-      - run: |
+        run: |
           for build in $(gh workflow list --all | grep -E '\brelease' | awk '{print $1}'); 
             do 
             gh run list -w $build --json name,headSha,status,url --jq '.[] | select((.headSha == '\"${{ inputs.commitId }}\"') and (.status == "waiting")) | {name,status,url}' | cat | head -n 1
