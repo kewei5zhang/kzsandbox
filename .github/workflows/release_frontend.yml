@@ -5,7 +5,6 @@ jobs:
   deploy_to_frontend_devnet:
     name: Deploy to Frontend Devnet
     runs-on: ubuntu-latest
-    environment: Production
     steps:
     - uses: actions/checkout@v3
     - name: Wait for tests to succeed
@@ -22,7 +21,6 @@ jobs:
   deploy_to_frontend_canary:
     name: Deploy to Frontend Canary
     runs-on: ubuntu-latest
-    environment: Production
     steps:
     - uses: actions/checkout@v3
     - name: Wait for tests to succeed
@@ -39,6 +37,7 @@ jobs:
   deploy_to_frontend_mainnet:
     name: Deploy to Frontend Mainnet
     runs-on: ubuntu-latest
+    needs: [deploy_to_frontend_devnet,deploy_to_frontend_canary]
     environment: Production
     steps:
     - uses: actions/checkout@v3
