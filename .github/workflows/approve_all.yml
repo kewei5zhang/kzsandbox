@@ -8,35 +8,35 @@ on:
 jobs:
   approve_pipelines:
     runs-on: ubuntu-latest
-    # steps:
-    #   - name: find all waiting pipelines
-    #     run: |
-    #       for build in $(gh workflow list --all | grep -E '\brelease' | awk '{print $1}'); 
-    #         do 
-    #         gh run list -w $build --json name,headSha,status,url --jq '.[] | select((.headSha == '\"${{ inputs.commitId }}\"') and (.status == "waiting")) | {name,status,url}' | cat | head -n 1
-    #       done
-    #     env:
-    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #       OWNER: ${{ github.repository_owner }}
-    #       REPO: ${{ github.event.repository.name }}
     steps:
-      - run: |
-          numOpenIssues="$(gh api graphql -F owner=$OWNER -F name=$REPO -f query='
-            query($name: String!, $owner: String!) {
-              repository(owner: $owner, name: $name) {
-                issues(states:OPEN){
-                  totalCount
-                }
-              }
-            }
-          ' --jq '.data.repository.issues.totalCount')"
-
-          echo 'NUM_OPEN_ISSUES='$numOpenIssues >> $GITHUB_ENV
+      - name: find all waiting pipelines
+        run: |
+          for build in $(gh workflow list --all | grep -E '\brelease' | awk '{print $1}'); 
+          do 
+            gh run list -w $build --json name,headSha,status,url --jq '.[] | select((.headSha == '\"${{ inputs.commitId }}\"') and (.status == "waiting")) | {name,status,url}' | cat | head -n 1
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
-      - run: |
-          gh issue create --title "Issue report" --body "$NUM_OPEN_ISSUES issues remaining" --repo $GITHUB_REPOSITORY
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # steps:
+    #   - run: |
+    #       numOpenIssues="$(gh api graphql -F owner=$OWNER -F name=$REPO -f query='
+    #         query($name: String!, $owner: String!) {
+    #           repository(owner: $owner, name: $name) {
+    #             issues(states:OPEN){
+    #               totalCount
+    #             }
+    #           }
+    #         }
+    #       ' --jq '.data.repository.issues.totalCount')"
+
+    #       echo 'NUM_OPEN_ISSUES='$numOpenIssues >> $GITHUB_ENV
+    #     env:
+    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #       OWNER: ${{ github.repository_owner }}
+    #       REPO: ${{ github.event.repository.name }}
+    #   - run: |
+    #       gh issue create --title "Issue report" --body "$NUM_OPEN_ISSUES issues remaining" --repo $GITHUB_REPOSITORY
+    #     env:
+    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
