@@ -1,6 +1,11 @@
 name: release_backend_v1
 on: [push]
 
+defaults:
+  run:
+    shell: bash
+    working-directory: js/packages/backend
+
 jobs:
   build_docker_image:
     name: Docker Image
