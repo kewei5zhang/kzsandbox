@@ -1,2 +1,2 @@
-# kzsandbox
-JS and TS demo app 
+# node_cicd
+Demo repo for node js cicd

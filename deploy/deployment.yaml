@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kzsandbox
+  labels:
+    app: kzsandbox
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kzsandbox
+  template:
+    metadata:
+      labels:
+        app: kzsandbox
+    spec:
+      containers:
+      - name: kzsandbox
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80

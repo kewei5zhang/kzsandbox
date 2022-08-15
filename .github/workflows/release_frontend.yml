@@ -1,0 +1,20 @@
+name: release_backend_v1
+on: [push]
+
+jobs:
+  deploy_to_frontend:
+    name: Deploy Indexers to Mainnet
+    needs: [build_docker_image]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Wait for tests to succeed
+      uses: lewagon/wait-on-check-action@v1.0.0
+      with:
+        ref: ${{ github.sha }}
+        check-name: build_docker_image
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        wait-interval: 10
+    - name: Mimic Deployment
+      run: |
+        echo "Deploying ..."
