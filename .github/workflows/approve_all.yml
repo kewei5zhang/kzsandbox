@@ -1,0 +1,20 @@
+name: approve_all_workflow
+on:
+   workflow_dispatch:
+    inputs:
+      commitId:
+        description: commit id
+        required: true
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for build in $(gh workflow list --all | grep -E '\brelease' | awk '{print $1}'); 
+            do 
+            gh run list -w $build --json name,headSha,status,url --jq '.[] | select((.headSha == '\"$MERGE_COMMIT\"') and (.status == "waiting")) | {name,status,url}' | cat | head -n 1
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}

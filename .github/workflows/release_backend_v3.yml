@@ -1,0 +1,35 @@
+name: release_backend_v3
+on: [push]
+
+defaults:
+  run:
+    shell: bash
+    working-directory: js/packages/backend
+
+jobs:
+  build_docker_image:
+    name: Docker Image
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - uses: docker/build-push-action@v3
+        name: Build Image
+        with:
+          context: .
+          file: js/packages/backend/Dockerfile
+          push: false
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
+          tags: backend_v3
+  deploy_to_mainnet:
+    name: Deploy to Mainnet
+    needs: [build_docker_image]
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+    - uses: actions/checkout@v3
+    - name: Mimic Deployment
+      run: |
+        echo "Deploying ..."

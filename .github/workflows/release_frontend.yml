@@ -5,6 +5,7 @@ jobs:
   deploy_to_frontend:
     name: Deploy to Frontend
     runs-on: ubuntu-latest
+    environment: Production
     steps:
     - uses: actions/checkout@v3
     - name: Wait for tests to succeed
