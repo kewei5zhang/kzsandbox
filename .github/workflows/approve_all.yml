@@ -30,8 +30,7 @@ jobs:
           for build in $(gh workflow list --all -R $OWNER/$REPO | grep -E '\brelease' | awk '{print $1}'); 
           do 
             RUN_ID==$(gh run list -R $OWNER/$REPO -w $build --json name,headSha,status,url,databaseId --jq '.[] | select((.headSha == '\"${{ inputs.commitId }}\"') and (.status == "waiting")) | .databaseId')
-            echo "gh deploy --env prod --run-id $RUN_ID --repo magiceden/magiceden --approve"
-            gh deploy --env prod --run-id $RUN_ID --repo magiceden/magiceden --approve
+            [[ ! -z "$RUN_ID" ]] && echo "gh deploy --env prod --run-id $RUN_ID --repo magiceden/magiceden --approve"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
