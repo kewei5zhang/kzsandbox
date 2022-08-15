@@ -14,6 +14,7 @@ jobs:
         check-name: 'Docker Image'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         wait-interval: 10
+        allowed-conclusions: success,skipped,cancelled
     - name: Mimic Deployment
       run: |
         echo "Deploying ..."
