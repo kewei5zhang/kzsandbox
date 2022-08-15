@@ -11,8 +11,9 @@ jobs:
     steps:
       - name: find all waiting pipelines
         run: |
-          echo "Install gh deploy extention to approve workflow"
+          echo "Pre-req: Run Below command to install gh deploy extention to approve workflow"
           echo "gh extension install yuri-1987/gh-deploy"
+          echo "Run below commands to approve all deployments:"
           for build in $(gh workflow list --all -R $OWNER/$REPO | grep -E '\brelease' | awk '{print $1}'); 
           do 
             RUN_ID=$(gh run list -R $OWNER/$REPO -w $build --json name,headSha,status,url,databaseId --jq '.[] | select((.headSha == '\"${{ inputs.commitId }}\"') and (.status == "waiting")) | .databaseId')
