@@ -1,8 +1,7 @@
 FROM node:alpine as builder
 WORKDIR /home/kzsandbox
-COPY js/packages/backend/package.json .
+COPY js/packages/backend/ .
 RUN npm install
-COPY . .
 RUN npx tsc
 
 FROM node:alpine
