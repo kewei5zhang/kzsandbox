@@ -45,8 +45,9 @@ jobs:
         echo "Deploying Canary ..."
   deploy_to_mainnet:
     name: Deploy to Mainnet
-    needs: [build_docker_image]
+    needs: [build_docker_image, deploy_to_devnet, deploy_to_canary]
     runs-on: ubuntu-latest
+    environment: Production
     steps:
     - uses: actions/checkout@v3
     - name: Mimic Deployment
