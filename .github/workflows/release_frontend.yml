@@ -2,8 +2,42 @@ name: release_frontend
 on: [push]
 
 jobs:
-  deploy_to_frontend:
-    name: Deploy to Frontend
+  deploy_to_frontend_devnet:
+    name: Deploy to Frontend Devnet
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+    - uses: actions/checkout@v3
+    - name: Wait for tests to succeed
+      uses: lewagon/wait-on-check-action@v1.0.0
+      with:
+        ref: ${{ github.ref }}
+        check-name: 'Deploy to Devnet'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        wait-interval: 10
+        allowed-conclusions: success,skipped,cancelled
+    - name: Mimic Deployment
+      run: |
+        echo "Deploying Devnet..."
+  deploy_to_frontend_canary:
+    name: Deploy to Frontend Canary
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+    - uses: actions/checkout@v3
+    - name: Wait for tests to succeed
+      uses: lewagon/wait-on-check-action@v1.0.0
+      with:
+        ref: ${{ github.ref }}
+        check-name: 'Deploy to Canary'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        wait-interval: 10
+        allowed-conclusions: success,skipped,cancelled
+    - name: Mimic Deployment
+      run: |
+        echo "Deploying Canary ..."
+  deploy_to_frontend_mainnet:
+    name: Deploy to Frontend Mainnet
     runs-on: ubuntu-latest
     environment: Production
     steps:
@@ -18,4 +52,4 @@ jobs:
         allowed-conclusions: success,skipped,cancelled
     - name: Mimic Deployment
       run: |
-        echo "Deploying ..."
+        echo "Deploying Mainnet ..."

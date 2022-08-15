@@ -23,6 +23,26 @@ jobs:
           # cache-from: type=gha
           # cache-to: type=gha,mode=max
           tags: backend_v1
+  deploy_to_devnet:
+    name: Deploy to Devnet
+    needs: [build_docker_image]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Mimic Deployment
+      run: |
+        sleep 10
+        echo "Deploying Devnet ..."
+  deploy_to_canary:
+    name: Deploy to Canary
+    needs: [build_docker_image]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Mimic Deployment
+      run: |
+        sleep 10
+        echo "Deploying Canary ..."
   deploy_to_mainnet:
     name: Deploy to Mainnet
     needs: [build_docker_image]
@@ -31,5 +51,5 @@ jobs:
     - uses: actions/checkout@v3
     - name: Mimic Deployment
       run: |
-        sleep 20
-        echo "Deploying ..."
+        sleep 10
+        echo "Deploying Mainnet ..."

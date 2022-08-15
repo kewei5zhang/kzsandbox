@@ -6,7 +6,7 @@ on:
         description: commit id
         required: true
 jobs:
-  approve_pipelines:
+  get_pipelines:
     runs-on: ubuntu-latest
     steps:
       - name: find all waiting pipelines
@@ -19,24 +19,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
-    # steps:
-    #   - run: |
-    #       numOpenIssues="$(gh api graphql -F owner=$OWNER -F name=$REPO -f query='
-    #         query($name: String!, $owner: String!) {
-    #           repository(owner: $owner, name: $name) {
-    #             issues(states:OPEN){
-    #               totalCount
-    #             }
-    #           }
-    #         }
-    #       ' --jq '.data.repository.issues.totalCount')"
-
-    #       echo 'NUM_OPEN_ISSUES='$numOpenIssues >> $GITHUB_ENV
-    #     env:
-    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #       OWNER: ${{ github.repository_owner }}
-    #       REPO: ${{ github.event.repository.name }}
-    #   - run: |
-    #       gh issue create --title "Issue report" --body "$NUM_OPEN_ISSUES issues remaining" --repo $GITHUB_REPOSITORY
-    #     env:
-    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  approve_pipelines:
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - name: approve all waiting pipelines
+        run: |
+          gh extension install yuri-1987/gh-deploy
+          for build in $(gh workflow list --all -R $OWNER/$REPO | grep -E '\brelease' | awk '{print $1}'); 
+          do 
+            RUN_ID==$(gh run list -R $OWNER/$REPO -w $build --json name,databaseId --jq '.[] | select((.headSha == '\"${{ inputs.commitId }}\"') and (.status == "waiting")) | .databaseId' | cat | head -n 1)
+            echo "gh deploy --env prod --run-id $RUN_ID --repo magiceden/magiceden --approve"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
