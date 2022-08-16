@@ -1,23 +1,27 @@
-name: 'Hello World'
-description: 'Greet someone'
+name: deploy_eks
+description: 'Helm Deployment'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  commitId: 
+    description: 'Commit ID'
     required: true
-    default: 'World'
-outputs:
-  random-number:
-    description: "Random number"
-    value: ${{ steps.random-number-generator.outputs.random-number }}
+  valuefile:
+    description: 'Value File Path'
+    required: true
+  release:
+    description: 'Release name'
+    required: true
+  working-directory:
+    description: working directory
+    required: true
 runs:
   using: "composite"
   steps:
-    - run: echo Hello ${{ inputs.who-to-greet }}.
+    - name: Mimic Helm Deploy
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
-    - id: random-number-generator
-      run: echo "::set-output name=random-number::$(echo $RANDOM)"
-      shell: bash
-    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
-      shell: bash          
-    - run: goodbye.sh
-      shell: bash
+      run: |
+        echo "Deploy Helm Chat with Below Values"
+        echo "Namespace: ${{ inputs.namespace }}"
+        echo "Commit ID: ${{ inputs.commitId }}"
+        echo "Value File Path: ${{ inputs.valuefile }}"
+        echo "Release name: ${{ inputs.release }}"

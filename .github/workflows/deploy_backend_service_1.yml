@@ -1,0 +1,39 @@
+name: deploy_backend_service_1
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: Image tag or commit SHA
+        required: true
+  workflow_run:
+    workflows:
+      - release_all
+    types:
+      - requested
+
+jobs:
+  deploy_to_mainnet:
+    name: Deploy to Mainnet
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Wait for build to succeed
+        uses: lewagon/wait-on-check-action@v1.0.0
+        with:
+          ref: ${{ github.event.inputs.tag || github.event.workflow_run.head_commit.id }}
+          check-name: 'Release all - Build Docker Image' # The same name as docker build job in release_all
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+          allowed-conclusions: success,skipped
+      - name: Deploy to EKS
+        uses: ./.github/actions/deploy_eks
+        with:
+          tag: ${{ github.event.inputs.tag || github.event.workflow_run.head_commit.id }}
+          namespace: namespace1
+          release: release1
+          valuefile: release1_value.yaml
+          working-directory: js/packages/backend
