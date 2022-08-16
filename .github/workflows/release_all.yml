@@ -25,6 +25,7 @@ jobs:
   build_docker_image:
     name: Release all - Build Docker Image
     runs-on: ubuntu-latest
+    needs: [build_builder_image]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
