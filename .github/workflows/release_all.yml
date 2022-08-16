@@ -23,6 +23,7 @@ jobs:
           # cache-from: type=gha
           # cache-to: type=gha,mode=max
           tags: builder
+          outputs: type=docker,dest=/tmp/builder.tar
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
