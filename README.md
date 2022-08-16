@@ -1,4 +1,4 @@
-# Monorepo Multi Work Stream CD Design
+# Monorepo Multi Work Stream CD Revamp
 
 ## In Scope
 
@@ -14,9 +14,8 @@
 
 - We are moving away from monorepo, we need an intermediate solution to serve our deployments in a work stream model before migrating to a multi-repo structure.
 
-## Multiple Work Stream Monorepo CD Revamp
+## Requirements:
 
-Requirements:
 - Each workstream includes steps of docker image build, devnet deployment (optional), canary deployment (optional), prod deployment.
 - Approval required for prod deployment
 - One-click approve all deployments
