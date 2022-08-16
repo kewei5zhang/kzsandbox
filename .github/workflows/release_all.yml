@@ -19,8 +19,8 @@ jobs:
           context: .
           file: js/packages/backend/Dockerfile
           push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
           tags: builder
   build_docker_image:
     name: Release all - Build Docker Image
@@ -36,8 +36,8 @@ jobs:
           context: .
           file: js/packages/backend/Dockerfile
           push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
           tags: backend_v1
   deploy_all_to_devnet:
     name: Deploy to Devnet
