@@ -20,23 +20,34 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/builder/.buildx-cache
+          key: ${{ runner.os }}-buildx-builder-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-builder-
       - uses: docker/build-push-action@v3
         name: Build Image
         with:
           context: .
           file: builder.Dockerfile
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/builder/.buildx-cache
+          cache-to: type=local,dest=/tmp/builder/.buildx-cache-new,mode=max
           tags: |
             keweizhang/builder
+      - name: Move cache
+        run: |
+          rm -rf /tmp/builder/.buildx-cache
+          mv /tmp/builder/.buildx-cache-new /tmp/builder/.buildx-cache
       # - name: Upload artifact
       #   uses: actions/upload-artifact@v2
       #   with:
       #     name: builder
       #     path: /tmp/builder.tar
   build_runner_image:
-    name: Build Ruuner Image
+    name: Build Runner Image
     runs-on: ubuntu-latest
     needs: [build_builder_image]
     steps:
@@ -54,6 +65,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/runner/.buildx-cache
+          key: ${{ runner.os }}-buildx-runner-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-runner-
       - name: Load Docker image
         run: |
           docker pull keweizhang/builder
@@ -64,9 +82,13 @@ jobs:
           context: .
           file: js/packages/backend/backend.Dockerfile
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/runner/.buildx-cache
+          cache-to: type=local,dest=/tmp/runner/.buildx-cache-new,mode=max
           tags: keweizhang/runner
+      - name: Move cache
+        run: |
+          rm -rf /tmp/runner/.buildx-cache
+          mv /tmp/runner/.buildx-cache-new /tmp/runner/.buildx-cache
   deploy_all_to_devnet:
     name: Deploy to Devnet
     needs: [build_runner_image]
