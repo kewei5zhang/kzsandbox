@@ -18,10 +18,6 @@ jobs:
         with:
           context: .
           file: builder.Dockerfile
-          push: false
-          load: true
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
           tags: builder
           outputs: type=docker,dest=/tmp/builder.tar
       - name: Upload artifact
