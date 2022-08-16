@@ -20,7 +20,7 @@ jobs:
         with:
           context: .
           file: builder.Dockerfile
-          tags: builder
+          tags: builder:latest
           outputs: type=docker,dest=/tmp/builder.tar
       - name: Upload artifact
         uses: actions/upload-artifact@v2
