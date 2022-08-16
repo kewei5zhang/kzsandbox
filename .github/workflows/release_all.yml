@@ -44,6 +44,7 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/builder.tar
+          docker image ls -a
       - uses: docker/build-push-action@v3
         name: Build Image
         with:
