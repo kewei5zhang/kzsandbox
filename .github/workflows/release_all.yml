@@ -26,6 +26,8 @@ jobs:
           context: .
           file: builder.Dockerfile
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             keweizhang/builder
       # - name: Upload artifact
@@ -33,8 +35,8 @@ jobs:
       #   with:
       #     name: builder
       #     path: /tmp/builder.tar
-  build_docker_image:
-    name: Release all - Build Docker Image
+  build_runner_image:
+    name: Build Ruuner Image
     runs-on: ubuntu-latest
     needs: [build_builder_image]
     steps:
@@ -62,9 +64,9 @@ jobs:
           context: .
           file: js/packages/backend/backend.Dockerfile
           push: true
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
-          tags: keweizhang/backend_v1
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: keweizhang/runner
   deploy_all_to_devnet:
     name: Deploy to Devnet
     needs: [build_docker_image]
