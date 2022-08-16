@@ -27,7 +27,7 @@ jobs:
           file: builder.Dockerfile
           push: true
           tags: |
-            keweizhang/builder:latest
+            keweizhang/builder/builder:latest
             builder
       # - name: Upload artifact
       #   uses: actions/upload-artifact@v2
