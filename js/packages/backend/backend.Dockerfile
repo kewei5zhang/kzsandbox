@@ -1,4 +1,4 @@
 FROM node:alpine
-COPY --from=builder /build .
+COPY --from=builder:latest /build .
 WORKDIR /build
 CMD ["node", "./dist/server.js"]
