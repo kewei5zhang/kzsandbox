@@ -19,6 +19,7 @@ jobs:
           context: .
           file: builder.Dockerfile
           push: false
+          load: true
           # cache-from: type=gha
           # cache-to: type=gha,mode=max
           tags: builder
