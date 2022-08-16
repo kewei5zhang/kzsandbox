@@ -55,16 +55,17 @@ jobs:
       - name: Load Docker image
         run: |
           docker pull keweizhang/builder
+          docker tag keweizhang/builder:latest builder:latest
           docker image ls -a
       - uses: docker/build-push-action@v3
         name: Build Image
         with:
           context: .
           file: js/packages/backend/backend.Dockerfile
-          push: false
+          push: true
           # cache-from: type=gha
           # cache-to: type=gha,mode=max
-          tags: backend_v1
+          tags: keweizhang/backend_v1
   deploy_all_to_devnet:
     name: Deploy to Devnet
     needs: [build_docker_image]
