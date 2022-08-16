@@ -17,7 +17,7 @@ jobs:
         name: Build Image
         with:
           context: .
-          file: js/packages/backend/Dockerfile
+          file: builder.Dockerfile
           push: false
           # cache-from: type=gha
           # cache-to: type=gha,mode=max
@@ -35,7 +35,7 @@ jobs:
         name: Build Image
         with:
           context: .
-          file: js/packages/backend/Dockerfile
+          file: js/packages/backend/backend.Dockerfile
           push: false
           # cache-from: type=gha
           # cache-to: type=gha,mode=max
