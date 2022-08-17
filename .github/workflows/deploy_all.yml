@@ -1,4 +1,4 @@
-name: release_all
+name: deploy_all
 on: [push]
 
 defaults:
@@ -8,7 +8,7 @@ defaults:
 
 jobs:
   build_docker_image:
-    name: Build Docker Image
+    name: Build KZSandbox Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

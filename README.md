@@ -1,17 +1,30 @@
 # Monorepo Multi Work Stream CD Revamp 
 
-## Iteration 1
-
-### In Scope
+## In Scope
 
 - Continuous Deployment
 - Environment Approvals
 - Backend and Frontend Deployments
 
-### Not In Scope
+## Not In Scope
 
 - Continuous Integration
 - Release strategy
+## Iteration 2
+### Requirements:
+
+- One pipeline to approve/run to deploy all 
+- One pipeline to approve/run to rollback all
+- For each service one pipeline to approve/run to deploy one
+- Frontend deployment needs to wait for backend deployment
+
+### Design
+
+- **deploy_all** - one pipeline to build the mega image and trigger devnet, canary and mainnet deployment using matrix deployment strategy
+- **deploy_all_canary, deploy_all_devnet, deploy_all_mainnet** - reusable jobs for both deploy_all and manual trigger for rollback activities. 
+- **deploy_backend_services** - workflow run jobs for individual service deployment. These jobs are spawn up along with deploy_all job request and wait for the docker build to complete.
+## Iteration 1
+
 ### Assumptions
 
 - We are moving away from monorepo, we need an intermediate solution to serve our deployments in a work stream model before migrating to a multi-repo structure.

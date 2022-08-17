@@ -30,7 +30,7 @@ jobs:
           namespace: indexing-canary
           release: ${{ matrix.release }}
           valuefile: ${{ matrix.valuefile }}
-          working-directory: js/packages/backend
+          chart: js/packages/backend
   deploy_cf_to_canary:
     name: Deploy to Frontend Canary
     needs: [deploy_all_to_canary]

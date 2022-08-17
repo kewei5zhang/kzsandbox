@@ -39,7 +39,7 @@ jobs:
           namespace: indexing-mainnet
           release: ${{ matrix.release }}
           valuefile: ${{ matrix.valuefile }}
-          working-directory: js/packages/backend
+          chart: js/packages/backend
   deploy_to_frontend_mainnet:
     name: Deploy to Frontend Mainnet
     runs-on: ubuntu-latest

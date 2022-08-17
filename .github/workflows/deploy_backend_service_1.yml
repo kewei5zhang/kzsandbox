@@ -9,7 +9,7 @@ on:
         required: true
   workflow_run:
     workflows:
-      - release_all
+      - deploy_all
     types:
       - requested
 
@@ -25,7 +25,7 @@ jobs:
         uses: lewagon/wait-on-check-action@v1.0.0
         with:
           ref: ${{ inputs.tag || github.event.workflow_run.head_commit.id }}
-          check-name: 'Build Docker Image' # The same name as docker build job in release_all
+          check-name: 'Build KZSandbox Docker Image' # The same name as docker build job in release_all
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
           allowed-conclusions: success,skipped
