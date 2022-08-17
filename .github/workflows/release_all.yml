@@ -95,4 +95,4 @@ jobs:
   deploy_all_to_mainnet:
     name: Deploy All to Mainnet
     needs: [publish_docker_image]
-    uses: .github/workflows/deploy_all_mainnet.yml@main
+    uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_mainnet.yml@main
