@@ -1,27 +1,29 @@
-# Monorepo Multi Work Stream CD Revamp
+# Monorepo Multi Work Stream CD Revamp 
 
-## In Scope
+## Iteration 1
+
+### In Scope
 
 - Continuous Deployment
 - Environment Approvals
 - Backend and Frontend Deployments
 
-## Not In Scope
+### Not In Scope
 
 - Continuous Integration
 - Release strategy
-## Assumptions
+### Assumptions
 
 - We are moving away from monorepo, we need an intermediate solution to serve our deployments in a work stream model before migrating to a multi-repo structure.
 
-## Requirements:
+### Requirements:
 
 - Each workstream includes steps of docker image build, devnet deployment (optional), canary deployment (optional), prod deployment.
 - Approval required for prod deployment
 - One-click approve all deployments
 - Frontend deployment need to wait on backend deployments
 
-## Design
+### Design
 
 1. One release pipeline per backend service includes image build, devnet deployment, canary deployment and mainnet deployment. Approval is required for mainnet deployment. image build is required for all deployment steps. canary and devnet deployments are required by mainnet deployment. This is achieved using the `needs` keyword.
 ![](.github/docs/images/backend_workflow.png)

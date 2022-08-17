@@ -8,7 +8,7 @@ defaults:
 
 jobs:
   build_docker_image:
-    name: Update Docker Image
+    name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

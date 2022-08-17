@@ -24,7 +24,7 @@ jobs:
       - name: Wait for build to succeed
         uses: lewagon/wait-on-check-action@v1.0.0
         with:
-          ref: ${{ github.event.inputs.tag || github.event.workflow_run.head_commit.id }}
+          ref: ${{ inputs.tag || github.event.workflow_run.head_commit.id }}
           check-name: 'Release all - Build Docker Image' # The same name as docker build job in release_all
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
@@ -32,7 +32,7 @@ jobs:
       - name: Deploy to EKS
         uses: ./.github/actions/deploy_eks
         with:
-          tag: ${{ github.event.inputs.tag || github.event.workflow_run.head_commit.id }}
+          tag: ${{ inputs.tag || github.event.workflow_run.head_commit.id }}
           namespace: namespace3
           release: release3
           valuefile: release3_value.yaml

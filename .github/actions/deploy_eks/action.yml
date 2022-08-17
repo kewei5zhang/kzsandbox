@@ -1,8 +1,11 @@
 name: deploy_eks
 description: 'Helm Deployment'
 inputs:
-  commitId: 
+  tag: 
     description: 'Commit ID'
+    required: true
+  repo:
+    description: 'Repo name'
     required: true
   valuefile:
     description: 'Value File Path'
@@ -10,18 +13,22 @@ inputs:
   release:
     description: 'Release name'
     required: true
-  working-directory:
-    description: working directory
+  namespace:
+    description: 'namespace name'
+    required: true
+  chart:
+    description: chart working directory
     required: true
 runs:
   using: "composite"
   steps:
     - name: Mimic Helm Deploy
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ inputs.chart }}
       shell: bash
       run: |
         echo "Deploy Helm Chat with Below Values"
+        echo "Chart path: ${{ inputs.chart }}"
         echo "Namespace: ${{ inputs.namespace }}"
-        echo "Commit ID: ${{ inputs.commitId }}"
+        echo "Commit ID: ${{ inputs.tag }}"
         echo "Value File Path: ${{ inputs.valuefile }}"
         echo "Release name: ${{ inputs.release }}"
