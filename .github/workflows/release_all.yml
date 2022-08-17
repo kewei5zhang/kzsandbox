@@ -24,7 +24,7 @@ jobs:
         name: Build Image
         with:
           context: .
-          file: builder.Dockerfile
+          file: js/packages/backend/Dockerfile
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -40,5 +40,5 @@ jobs:
     uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_canary.yml@master
   deploy_all_to_mainnet:
     name: Deploy All to Mainnet
-    needs: [publish_docker_image]
+    needs: [build_docker_image]
     uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_mainnet.yml@master
