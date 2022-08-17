@@ -1,0 +1,42 @@
+name: deploy_all_devnet
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: Image tag or commit SHA
+        required: true
+  workflow_call:
+
+jobs:
+  deploy_all_to_devnet:
+    name: Deploy to Devnet
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - release: acct-broker
+            valuefile: ./devnet/acct-broker-values.yaml
+          - release: acct-backfill-broker
+            valuefile: ./devnet/acct-backfill-broker-values.yaml
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Deploy to EKS
+        uses: ./.github/actions/deploy_eks
+        with:
+          tag: ${{ github.sha }}
+          namespace: indexing-devnet
+          release: ${{ matrix.release }}
+          valuefile: ${{ matrix.valuefile }}
+          working-directory: js/packages/backend
+  deploy_cf_to_devnet:
+    name: Deploy to Frontend Devnet
+    needs: [deploy_all_to_devnet]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Mimic Deployment
+      run: |
+        echo "Deploying Frontend Devnet..."

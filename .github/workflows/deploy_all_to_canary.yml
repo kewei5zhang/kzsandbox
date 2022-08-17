@@ -1,0 +1,42 @@
+name: deploy_all_canary
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: Image tag or commit SHA
+        required: true
+  workflow_call:
+
+jobs:
+  deploy_all_to_canary:
+    name: Deploy to Canary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - release: acct-broker
+            valuefile: ./mainnet/acct-broker-values.yaml
+          - release: acct-backfill-broker
+            valuefile: ./mainnet/acct-backfill-broker-values.yaml
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Deploy to EKS
+        uses: ./.github/actions/deploy_eks
+        with:
+          tag: ${{ github.sha }}
+          namespace: indexing-canary
+          release: ${{ matrix.release }}
+          valuefile: ${{ matrix.valuefile }}
+          working-directory: js/packages/backend
+  deploy_cf_to_canary:
+    name: Deploy to Frontend Canary
+    needs: [deploy_all_to_canary]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Mimic Deployment
+      run: |
+        echo "Deploying Frontend Canary ..."

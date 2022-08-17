@@ -7,8 +7,8 @@ defaults:
     working-directory: js/packages/backend
 
 jobs:
-  build_builder_image:
-    name: Update docker Image
+  build_docker_image:
+    name: Update Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -32,66 +32,12 @@ jobs:
             keweizhang/builder
   deploy_all_to_devnet:
     name: Deploy to Devnet
-    needs: [build_runner_image]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - release: acct-broker
-            valuefile: ./devnet/acct-broker-values.yaml
-          - release: acct-backfill-broker
-            valuefile: ./devnet/acct-backfill-broker-values.yaml
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Deploy to EKS
-        uses: ./.github/actions/deploy_eks
-        with:
-          tag: ${{ github.sha }}
-          namespace: indexing-devnet
-          release: ${{ matrix.release }}
-          valuefile: ${{ matrix.valuefile }}
-          working-directory: js/packages/backend
-  deploy_cf_to_devnet:
-    name: Deploy to Frontend Devnet
-    needs: [deploy_all_to_devnet]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Mimic Deployment
-      run: |
-        echo "Deploying Frontend Devnet..."
+    needs: [build_docker_image]
+    uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_devnet.yml@master
   deploy_all_to_canary:
     name: Deploy to Canary
-    needs: [build_runner_image]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - release: acct-broker
-            valuefile: ./mainnet/acct-broker-values.yaml
-          - release: acct-backfill-broker
-            valuefile: ./mainnet/acct-backfill-broker-values.yaml
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Deploy to EKS
-        uses: ./.github/actions/deploy_eks
-        with:
-          tag: ${{ github.sha }}
-          namespace: indexing-mainnet
-          release: ${{ matrix.release }}
-          valuefile: ${{ matrix.valuefile }}
-          working-directory: js/packages/backend
-  deploy_cf_to_canary:
-    name: Deploy to Frontend Canary
-    needs: [deploy_all_to_canary]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Mimic Deployment
-      run: |
-        echo "Deploying Frontend Canary ..."
+    needs: [build_docker_image]
+    uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_canary.yml@master
   deploy_all_to_mainnet:
     name: Deploy All to Mainnet
     needs: [publish_docker_image]
