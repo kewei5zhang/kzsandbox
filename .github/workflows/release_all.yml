@@ -29,7 +29,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
-            keweizhang/builder
+            keweizhang/backend
   deploy_all_to_devnet:
     name: Deploy to Devnet
     needs: [build_docker_image]
