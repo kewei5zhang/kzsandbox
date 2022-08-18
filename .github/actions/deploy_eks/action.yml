@@ -19,15 +19,18 @@ inputs:
   chart:
     description: chart working directory
     required: true
-  aws_secret:
-    description: AWS secret
-    required: true
+  # aws_secret:
+  #   description: AWS secret
+  #   required: true
 runs:
   using: "composite"
   steps:
     - name: Mimic Helm Deploy
       working-directory: ${{ inputs.chart }}
       shell: bash
+      # env:
+      #   AWS_SECRET: ${{ inputs.aws_secret }}
+      #   AWS_SECRET: ${{ inputs.aws_secret }}
       run: |
         echo "Deploy Helm Chat with Below Values"
         echo "Chart path: ${{ inputs.chart }}"
@@ -35,4 +38,4 @@ runs:
         echo "Commit ID: ${{ inputs.tag }}"
         echo "Value File Path: ${{ inputs.valuefile }}"
         echo "Release name: ${{ inputs.release }}"
-        echo "AWS Secret": ${{ inputs.aws_secret }}
+        echo "AWS Secret": $AWS_SECRET"

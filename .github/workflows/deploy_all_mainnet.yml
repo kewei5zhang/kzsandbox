@@ -34,13 +34,14 @@ jobs:
       #     allowed-conclusions: success,skipped
       - name: Deploy to EKS
         uses: ./.github/actions/deploy_eks
+        env:
+          AWS_SECRET: ${{ secrets.AWS_SECRET }}
         with:
           tag: ${{ inputs.tag || github.sha }}
           namespace: indexing-mainnet
           release: ${{ matrix.release }}
           valuefile: ${{ matrix.valuefile }}
           chart: js/packages/backend
-          aws_secret: ${{ secrets.AWS_SECRET }}
   deploy_to_frontend_mainnet:
     name: Deploy to Frontend Mainnet
     runs-on: ubuntu-latest
