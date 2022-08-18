@@ -19,7 +19,7 @@ inputs:
   chart:
     description: chart working directory
     required: true
-  AWS_SECRET:
+  aws_secret:
     description: AWS secret
     required: true
 runs:
@@ -35,4 +35,4 @@ runs:
         echo "Commit ID: ${{ inputs.tag }}"
         echo "Value File Path: ${{ inputs.valuefile }}"
         echo "Release name: ${{ inputs.release }}"
-        echo "AWS Secret": ${{ inputs.AWS_SECRET }}
+        echo "AWS Secret": ${{ inputs.aws_secret }}

@@ -40,7 +40,7 @@ jobs:
           release: ${{ matrix.release }}
           valuefile: ${{ matrix.valuefile }}
           chart: js/packages/backend
-          AWS_SECRET: ${{ secrets.AWS_SECRET }}
+          aws_secret: test
   deploy_to_frontend_mainnet:
     name: Deploy to Frontend Mainnet
     runs-on: ubuntu-latest
