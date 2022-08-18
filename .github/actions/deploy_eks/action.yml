@@ -19,6 +19,9 @@ inputs:
   chart:
     description: chart working directory
     required: true
+  AWS_SECRET:
+    description: AWS secret
+    required: true
 runs:
   using: "composite"
   steps:
@@ -32,3 +35,4 @@ runs:
         echo "Commit ID: ${{ inputs.tag }}"
         echo "Value File Path: ${{ inputs.valuefile }}"
         echo "Release name: ${{ inputs.release }}"
+        echo "AWS Secret": ${{ inputs.AWS_SECRET }}

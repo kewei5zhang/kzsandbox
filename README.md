@@ -13,6 +13,7 @@
 ## Iteration 2
 ### Requirements:
 
+- One image for monorepo
 - One pipeline to approve/run to deploy all 
 - One pipeline to approve/run to rollback all
 - For each service one pipeline to approve/run to deploy one
@@ -20,7 +21,7 @@
 
 ### Design
 
-- **build_docker_image job** - one image for monorepo
+- **publish_docker_image job** - one image for monorepo
 - **deploy_all** - one pipeline to build the mega image and trigger devnet, canary and mainnet deployment using matrix deployment strategy
 - **deploy_all_canary, deploy_all_devnet, deploy_all_mainnet** - reusable jobs for both deploy_all and manual trigger for rollback activities. 
 - **deploy_backend_services** - workflow run jobs for individual service deployment. These jobs are spawn up along with deploy_all job request and wait for the docker build to complete.

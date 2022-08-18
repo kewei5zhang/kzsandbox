@@ -30,12 +30,15 @@ jobs:
           cache-to: type=gha,mode=max
           tags: |
             keweizhang/backend
-  deploy_all_to_devnet:
+  deploy_all_devnet:
+    name: Deploy to Devnet
     needs: [build_docker_image]
     uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_devnet.yml@master
-  deploy_all_to_canary:
+  deploy_all_canary:
+    name: Deploy to Canary
     needs: [build_docker_image]
     uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_canary.yml@master
-  deploy_all_to_mainnet:
+  deploy_all_mainnet:
+    name: Deploy All to Mainnet
     needs: [build_docker_image]
     uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_mainnet.yml@master
