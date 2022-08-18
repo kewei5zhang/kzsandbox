@@ -38,4 +38,4 @@ runs:
         echo "Commit ID: ${{ inputs.tag }}"
         echo "Value File Path: ${{ inputs.valuefile }}"
         echo "Release name: ${{ inputs.release }}"
-        echo "AWS Secret": $AWS_SECRET"
+        echo "AWS Secret: $AWS_SECRET"
