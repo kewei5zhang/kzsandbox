@@ -34,16 +34,14 @@ jobs:
       #     allowed-conclusions: success,skipped
       - name: Deploy to EKS
         uses: ./.github/actions/deploy_eks
-        env:
-          AWS_SECRET: ${{ secrets.AWS_SECRET }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         with:
           tag: ${{ inputs.tag || github.sha }}
           namespace: indexing-mainnet
           release: ${{ matrix.release }}
           valuefile: ${{ matrix.valuefile }}
           chart: js/packages/backend
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   deploy_to_frontend_mainnet:
     name: Deploy to Frontend Mainnet
     runs-on: ubuntu-latest
