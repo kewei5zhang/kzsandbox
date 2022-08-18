@@ -36,6 +36,8 @@ jobs:
         uses: ./.github/actions/deploy_eks
         env:
           AWS_SECRET: ${{ secrets.AWS_SECRET }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         with:
           tag: ${{ inputs.tag || github.sha }}
           namespace: indexing-mainnet

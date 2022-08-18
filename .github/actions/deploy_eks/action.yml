@@ -25,6 +25,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Login to DockerHub
+      uses: docker/login-action@v1 
+      with:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_TOKEN
+    - name: Docker pull
+      shell: bash
+      run: docker pull kewezhang/backend
     - name: Mimic Helm Deploy
       working-directory: ${{ inputs.chart }}
       shell: bash
