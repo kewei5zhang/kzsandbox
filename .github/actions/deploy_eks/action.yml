@@ -35,7 +35,7 @@ runs:
         password: ${{ inputs.token }}
     - name: Docker pull
       shell: bash
-      run: docker pull kewezhang/backend
+      run: docker pull keweizhang/backend
     - name: Mimic Helm Deploy
       working-directory: ${{ inputs.chart }}
       shell: bash

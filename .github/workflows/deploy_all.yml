@@ -42,3 +42,6 @@ jobs:
     name: Deploy All to Mainnet
     # needs: [build_docker_image]
     uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_mainnet.yml@master
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
