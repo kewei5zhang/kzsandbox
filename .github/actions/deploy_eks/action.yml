@@ -19,10 +19,10 @@ inputs:
   chart:
     description: chart working directory
     required: true
-  DOCKERHUB_USERNAME:
+  username:
     description: DOCKERHUB_USERNAME
     required: true
-  DOCKERHUB_TOKEN:
+  token:
     description: DOCKERHUB_TOKEN
     required: true
 runs:
@@ -31,8 +31,8 @@ runs:
     - name: Login to DockerHub
       uses: docker/login-action@v1 
       with:
-        username: ${{ inputs.DOCKERHUB_USERNAME }}
-        password: ${{ inputs.DOCKERHUB_TOKEN }}
+        username: ${{ inputs.username }}
+        password: ${{ inputs.token }}
     - name: Docker pull
       shell: bash
       run: docker pull kewezhang/backend
