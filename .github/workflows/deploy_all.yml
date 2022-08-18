@@ -40,7 +40,7 @@ jobs:
   #   uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_canary.yml@master
   deploy_all_mainnet:
     name: Deploy All to Mainnet
-    # needs: [build_docker_image]
+    needs: [build_docker_image]
     uses: kewei5zhang/kzsandbox/.github/workflows/deploy_all_mainnet.yml@master
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
