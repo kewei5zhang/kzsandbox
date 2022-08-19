@@ -17,7 +17,6 @@ jobs:
   deploy_to_mainnet:
     name: Deploy to Mainnet
     runs-on: ubuntu-latest
-    environment: Production
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -36,4 +35,6 @@ jobs:
           namespace: namespace1
           release: release1
           valuefile: release1_value.yaml
-          working-directory: js/packages/backend
+          chart: js/packages/backend
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          token: ${{ secrets.DOCKERHUB_TOKEN }}
