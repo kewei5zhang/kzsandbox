@@ -18,8 +18,8 @@ jobs:
     name: Deploy to Mainnet
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      # - name: Checkout Code
+      #   uses: actions/checkout@v3
       - name: Wait for build to succeed
         uses: lewagon/wait-on-check-action@v1.0.0
         with:
