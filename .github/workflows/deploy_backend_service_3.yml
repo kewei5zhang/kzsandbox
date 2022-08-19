@@ -36,4 +36,6 @@ jobs:
           namespace: namespace3
           release: release3
           valuefile: release3_value.yaml
-          working-directory: js/packages/backend
+          chart: js/packages/backend
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          token: ${{ secrets.DOCKERHUB_TOKEN }}
