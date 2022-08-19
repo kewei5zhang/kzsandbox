@@ -31,7 +31,7 @@ jobs:
           tags: |
             keweizhang/backend
       - name: simulate long build 
-        run: sleep 30
+        run: sleep 120
   # deploy_all_devnet:
   #   name: Deploy to Devnet
   #   needs: [build_docker_image]
