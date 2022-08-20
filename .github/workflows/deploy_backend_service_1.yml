@@ -21,6 +21,7 @@ jobs:
       # - name: Checkout Code
       #   uses: actions/checkout@v3
       - name: Wait for Image Build
+        shell: bash
         run: |
           WAIT_TIME=0
           until false;
