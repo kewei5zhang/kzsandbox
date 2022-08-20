@@ -29,7 +29,7 @@ jobs:
           do
             if [[ $WAIT_TIME -gt 120 ]];
             then
-              echo "❌ Waiting for image build timeout! megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}"
+              echo "❌ Waiting for image build timeout! megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}" && exit 1
             fi
             echo "🌀 Waiting image build megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}. Checking every 30s..."
             sleep 30; ((WAIT_TIME++))
