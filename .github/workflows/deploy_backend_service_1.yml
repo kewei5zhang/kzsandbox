@@ -23,6 +23,7 @@ jobs:
       - name: Wait for Image Build
         shell: bash
         run: |
+          set +x
           WAIT_TIME=0
           until false
           do
