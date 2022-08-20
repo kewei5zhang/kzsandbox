@@ -27,12 +27,12 @@ jobs:
           WAIT_TIME=0
           until false > /dev/null;
           do
-            if [[ $WAIT_TIME -gt 120 ]];
+            if [[ $WAIT_TIME -gt 5 ]];
             then
               echo "❌ Waiting for image build timeout! megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}" && exit 1
             fi
             echo "🌀 Waiting image build megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}. Checking every 30s..."
-            sleep 30; ((WAIT_TIME++))
+            sleep 5; ((WAIT_TIME++))
           done
           echo "✅ Found image tag ${{ inputs.tag }} in repo ${{ inputs.repo }}."
       - name: Deploy to EKS
