@@ -25,7 +25,7 @@ jobs:
         run: |
           set +x
           WAIT_TIME=0
-          until false
+          until false > /dev/null
           do
             if [[ $WAIT_TIME -gt 120 ]];
             then
