@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           WAIT_TIME=0
-          until false;
+          until false
           do
             if [[ $WAIT_TIME -gt 120 ]];
             then
