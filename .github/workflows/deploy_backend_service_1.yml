@@ -20,22 +20,13 @@ jobs:
     steps:
       # - name: Checkout Code
       #   uses: actions/checkout@v3
-      - name: Wait for Image Build
-        shell: bash
-        run: |
-          set +x
-          WAIT_TIME=0
-          until false > /dev/null;
-          do
-            if [[ $WAIT_TIME -gt 120 ]];
-            then
-              echo "❌ Waiting for image build timeout! megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}"
-              exit 1
-            fi
-            echo "🌀 Waiting image build megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}. Checking every 30s..."
-            sleep 30; ((WAIT_TIME++))
-          done
-          echo "✅ Found image tag ${{ inputs.tag }} in repo ${{ inputs.repo }}."
+      - name: Wait for build to succeed
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-build
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Build KZSandbox Docker Image
+          ref: github.sha }}
       - name: Deploy to EKS
         uses: ./.github/actions/deploy_eks
         with:
