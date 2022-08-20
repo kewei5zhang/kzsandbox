@@ -20,14 +20,20 @@ jobs:
     steps:
       # - name: Checkout Code
       #   uses: actions/checkout@v3
-      - name: Wait for build to succeed
-        uses: lewagon/wait-on-check-action@v1.0.0
-        with:
-          ref: ${{ inputs.tag || github.event.workflow_run.head_commit.id }}
-          check-name: 'Build KZSandbox Docker Image' # The same name as docker build job in release_all
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-          allowed-conclusions: success,skipped
+      - name: Wait for Image Build
+        run: |
+          WAIT_TIME=0
+          until false;
+          do
+            if [[ $WAIT_TIME -gt 120 ]];
+            then
+              echo "❌ Waiting for image build timeout! megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}"
+              exit 1
+            fi
+            echo "🌀 Waiting image build megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}. Checking every 30s..."
+            sleep 30; ((WAIT_TIME++))
+          done
+          echo "✅ Found image tag ${{ inputs.tag }} in repo ${{ inputs.repo }}."
       - name: Deploy to EKS
         uses: ./.github/actions/deploy_eks
         with:
