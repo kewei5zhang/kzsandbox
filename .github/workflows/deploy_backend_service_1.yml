@@ -26,7 +26,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Build KZSandbox Docker Image
-          ref: github.sha }}
+          ref: ${{ github.sha }}
       - name: Deploy to EKS
         uses: ./.github/actions/deploy_eks
         with:
