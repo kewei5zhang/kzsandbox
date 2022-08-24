@@ -45,6 +45,7 @@ runs:
         then
           echo "Deploy scripts with v1"
         else
+          # adding comments testing
           echo "Deploy Helm Chat with Below Values"
           echo "Chart path: ${{ inputs.chart }}"
           echo "Namespace: ${{ inputs.namespace }}"
