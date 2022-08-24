@@ -30,8 +30,8 @@ jobs:
           cache-to: type=gha,mode=max
           tags: |
             keweizhang/backend
-      - name: simulate long build 
-        run: sleep 90
+      # - name: simulate long build 
+      #   run: sleep 90
   # deploy_all_devnet:
   #   name: Deploy to Devnet
   #   needs: [build_docker_image]

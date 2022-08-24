@@ -41,7 +41,7 @@ runs:
       shell: bash
       # env:
       run: |
-        if [[ ${{ inputs.release }} == "scripts" ]];
+        if [[ ${{ inputs.release }} == "scripts" ]]
         then
           echo "Deploy scripts with v1"
         else
@@ -52,3 +52,4 @@ runs:
           echo "Value File Path: ${{ inputs.valuefile }}"
           echo "Release name: ${{ inputs.release }}"
           echo "AWS Secret: $AWS_SECRET"
+        fi
