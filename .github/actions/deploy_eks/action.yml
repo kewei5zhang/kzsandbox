@@ -41,10 +41,14 @@ runs:
       shell: bash
       # env:
       run: |
-        echo "Deploy Helm Chat with Below Values"
-        echo "Chart path: ${{ inputs.chart }}"
-        echo "Namespace: ${{ inputs.namespace }}"
-        echo "Commit ID: ${{ inputs.tag }}"
-        echo "Value File Path: ${{ inputs.valuefile }}"
-        echo "Release name: ${{ inputs.release }}"
-        echo "AWS Secret: $AWS_SECRET"
+        if [[ ${{ inputs.release }} == "scripts" ]];
+        then
+          echo "Deploy scripts with v1"
+        else
+          echo "Deploy Helm Chat with Below Values"
+          echo "Chart path: ${{ inputs.chart }}"
+          echo "Namespace: ${{ inputs.namespace }}"
+          echo "Commit ID: ${{ inputs.tag }}"
+          echo "Value File Path: ${{ inputs.valuefile }}"
+          echo "Release name: ${{ inputs.release }}"
+          echo "AWS Secret: $AWS_SECRET"

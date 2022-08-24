@@ -25,6 +25,8 @@ jobs:
             valuefile: ./mainnet/acct-broker-values.yaml
           - release: acct-backfill-broker
             valuefile: ./mainnet/acct-backfill-broker-values.yaml
+          - release: scripts
+            valuefile: scripts
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
