@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aws-cli
+  namespace: mainnet-api
+spec:
+  serviceAccount: mainnet-core-trading-service 
+  serviceAccountName: mainnet-core-trading-service
+  containers:
+  - name: aws-cli 
+    image: amazon/aws-cli:latest  
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo hello; sleep 10;done"]
+    resources:
+      limits:
+        memory: 2Gi
+      requests:
+  tolerations:
+  - effect: NoSchedule
+    key: mixed-private
+    operator: Equal
+    value: "true"
+  restartPolicy: Never
