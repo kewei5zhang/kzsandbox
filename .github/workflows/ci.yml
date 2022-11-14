@@ -5,8 +5,11 @@ on:
       - 'js/packages/backend/**'
 jobs:
   build:
+    defaults:
+      run:
+        shell: bash
+        working-directory: js/packages/backend
     runs-on: ubuntu-latest
-    workingDirectory: js/packages/backend
     strategy:
       matrix:
         node-version: [12.x, 14.x, 16.x]
