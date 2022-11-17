@@ -4,21 +4,18 @@ on:
     paths:
       - 'js/packages/backend/**'
 jobs:
-  build:
+  backends:
     defaults:
       run:
         shell: bash
         working-directory: js/packages/backend
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.x, 14.x, 16.x]
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '16.14.0'
         cache: 'npm'
+        cache-dependency-path: js/packages/backend/yarn.lock
     - run: npm ci
     - run: npm run build --if-present
