@@ -33,7 +33,7 @@ runs:
 
       while { check_runs ; }
       do
-        echo "Waiting 5 seconds before checking queue position again..."
+        echo "Waiting 5 seconds before checking job status again..."
         sleep 5
       done
       echo "There are no runs waiting or running, continuing..."
