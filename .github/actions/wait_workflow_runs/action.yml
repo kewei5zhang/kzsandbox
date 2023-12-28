@@ -24,7 +24,7 @@ runs:
         actual_status=$(gh api \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/${GITHUB_REPOSITORY}/actions/runs/${{ inputs.run}} | jq -r '.status')
+          /repos/${GITHUB_REPOSITORY}/actions/runs/${{ inputs.run }} | jq -r '.status')
 
         if [[ "$actual_status" == "$status" ]]; then
           return 0  # True in bash
@@ -32,11 +32,6 @@ runs:
           return 1  # False in bash
         fi
       }
-
-      workflow="${{ inputs.workflow }}"
-      if [ -z "${{ inputs.workflow }}" ]; then
-        workflow="$(get_workflow_id)"
-      fi
 
       while { check_runs queued | check_runs in_progress | check_runs waiting; }
       do
