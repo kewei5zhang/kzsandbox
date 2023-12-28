@@ -1,0 +1,49 @@
+name: 'wait for workflow runs'
+description: |
+  This action will wait for any previous runs of the named workflow and
+  supplied run number to complete before returning.
+inputs:
+  workflow:
+    description: 'Workflow ID or filename, if omitted will use currently running workflow'
+    required: false
+  run:
+    description: 'Workflow run number'
+    default: ${{ github.run_number }}
+    required: false
+  github-token:
+    description: 'GitHub access token to perform API calls'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+  - id: poll
+    shell: bash
+    env:
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+    run: |-
+      check_runs() {
+        status="${1:-}"
+
+        actual_status=$(gh api \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /repos/${GITHUB_REPOSITORY}/actions/runs/${{ inputs.run}} | jq -r '.status')
+
+        if [[ "$actual_status" == "$status" ]]; then
+          return 0  # True in bash
+        else
+          return 1  # False in bash
+        fi
+      }
+
+      workflow="${{ inputs.workflow }}"
+      if [ -z "${{ inputs.workflow }}" ]; then
+        workflow="$(get_workflow_id)"
+      fi
+
+      while { get_runs queued & get_runs in_progress; }
+      do
+        echo "Waiting 5 seconds before checking queue position again..."
+        sleep 5
+      done
+      echo "There are no runs waiting or runing, continuing..."
