@@ -15,7 +15,7 @@ jobs:
       - name: Check Out The Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 100
+          fetch-depth: 0
       # Step 1: Fetch latest waiting deploys_all job ID
       - name: Fetch latest waiting deploys_all job ID
         id: fetch_job_id
