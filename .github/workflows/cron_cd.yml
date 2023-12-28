@@ -22,7 +22,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ secrets.ACTION_READ_TOKEN }}
 
       # Step 1: Fetch latest waiting deploys_all job ID
       - name: Fetch latest waiting deploys_all job ID
@@ -73,6 +72,12 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.prepare.outputs.release_needed == 'true' }}
     steps:      
+      # Step 0: Checkout
+      - name: Check Out The Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ACTION_READ_TOKEN }}
       # Step 4: Generate release note
       - name: Release note
         id: release-note
