@@ -78,11 +78,19 @@ jobs:
             ${{ env.RELEASE_NOTE }}
           SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
       
-      # Step 6 - Wait for 5 minutes for cancel
+      # Step 6: Wait for 5 minutes for cancel
       - name: Wait for 5 minutes
-        run: sleep 300
+        run: sleep 3
 
-      # Step 7: Send Slack Notification - Job Starting
+      # Step 7: Release Tagging
+      - name: Release Tagging
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "deployer@magiceden.io"
+          git tag -a ${{ env.RELEASE_TAG }} ${{ env.IMAGE_TAG }} -m "New release tag ${{ env.RELEASE_TAG }}"
+          git push origin ${{ env.RELEASE_TAG }}
+
+      # Step 8: Send Slack Notification - Job Starting
       - name: Slack notification
         uses: rtCamp/action-slack-notify@v2.2.1
         continue-on-error: true # Continue even if the Slack notification fails.
@@ -95,7 +103,7 @@ jobs:
             *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
           SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
 
-      # Step 8: Approve deployment
+      # Step 9: Approve deployment
       - name: Approve deployment
         shell: bash
         run: |
