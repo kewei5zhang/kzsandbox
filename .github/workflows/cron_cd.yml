@@ -137,6 +137,9 @@ jobs:
           run_id: ${{ env.JOB_ID }}
           org_name: ${{ github.repository_owner }}
           repo_name: kzsandbox
+        env:
+          ORG_NAME: ${{ github.repository_owner }}
+          REPO_NAME: kzsandbox
       
       # Step 11: Send Slack Notification - Job Finished
       - name: Slack notification
