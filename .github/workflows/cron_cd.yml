@@ -57,7 +57,7 @@ jobs:
         run: |
           # current_short_sha=$(curl -s -H "x-bypass-bot-key: ${{ secrets.CF_X_BYPASS_BOT_KEY }}" https://api-mainnet.magiceden.io/health | jq -r '.version')
           # current_full_sha=$(git rev-parse "$current_short_sha")
-          current_full_sha="977b2d4fb71826dc514418961701ec335fd0bf87"
+          current_full_sha="977b2d4fb71826dc514418961701ec335fd0bf87x"
           echo "current_full_sha=${current_full_sha}"
           echo "image_tag=${{ steps.extract_image_tag.outputs.image_tag }}"
           if git merge-base --is-ancestor $current_full_sha ${{ steps.extract_image_tag.outputs.image_tag }}; then
