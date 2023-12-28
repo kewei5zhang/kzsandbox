@@ -74,7 +74,7 @@ jobs:
           SLACK_CHANNEL: "test-slack-integration"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
           SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
-          SLACK_TITLE: "🚀 Deploying ${{ env.IMAGE_TAG }} in 5 mins"
+          SLACK_TITLE: "🕥 Deploying ${{ env.IMAGE_TAG }} in 5 mins"
           SLACK_MESSAGE: |
             *Release Tag:* ${{ env.RELEASE_TAG }}
             *Release notes:*
