@@ -128,7 +128,7 @@ jobs:
         
       
       # Step 10: Wait for deploys_all job to finish
-      - uses: jsok/serialize-workflow-action@v1
+      - uses: ../actions/serilize_workflow_runs
         id: wait-for-workflow-action
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
