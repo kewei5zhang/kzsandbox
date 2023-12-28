@@ -51,7 +51,7 @@ jobs:
         run: |
             latest_tag="$(git ls-remote --tags origin 'release-v*' | awk -F"/" '{gsub(/\^\{\}/, "", $3); print $3}' | sort -r | head -n 1)"
             commit_to_release="${{ env.IMAGE_TAG }}"
-            release_note="$(git --no-pager log --pretty="%C(#00D181)%h  %C(reset)%ad (%C(#F7D4E3)%cr%C(reset))%x09 %C(#E42575)%an: %C(reset)%s" --date=short $commit_to_release...$latest_tag)"
+            release_note="$(git --no-pager log --pretty=oneline --format='%h%x09%an%x09%x09%s' $commit_to_release...$latest_tag)"
             release_tag="release-v0.1.$(date -u +'%Y%m%d%H%M')"
             echo "### Release Info" >> "$GITHUB_STEP_SUMMARY"
             echo "- **Image tag:** $commit_to_release" >> "$GITHUB_STEP_SUMMARY"
