@@ -41,7 +41,7 @@ runs:
         workflow="$(get_workflow_id)"
       fi
 
-      while { get_runs queued & get_runs in_progress; }
+      while { check_runs queued & check_runs in_progress; }
       do
         echo "Waiting 5 seconds before checking queue position again..."
         sleep 5
