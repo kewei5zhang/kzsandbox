@@ -30,7 +30,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      # - name: Wait for build to succeed
+      - name: sleep
+        run: sleep 60
+        # - name: Wait for build to succeed
       #   uses: lewagon/wait-on-check-action@v1.0.0
       #   with:
       #     ref: ${{ inputs.tag || github.sha }}
