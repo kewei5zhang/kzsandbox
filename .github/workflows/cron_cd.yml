@@ -123,7 +123,7 @@ jobs:
             /repos/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}/pending_deployments \
             --input <(echo $JSON_DATA)
         env:
-          GH_TOKEN: ${{ inputs.ACTION_READ_TOKEN }}
+          GH_TOKEN: ${{ secrets.ACTION_READ_TOKEN }}
           ENVIRONMENT_ID: "591606016"
         
 
