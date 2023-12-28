@@ -42,7 +42,7 @@ jobs:
         id: extract_image_tag
         run: |
           image_tag=$(cat ./artifacts/image_tag/image_tag.txt)
-          echo "IMAGE_TAG=$image_tag >> $GITHUB_ENV"
+          echo "IMAGE_TAG=${image_tag} >> $GITHUB_ENV
 
       # Step 4: Generate release note
       - name: Release note
