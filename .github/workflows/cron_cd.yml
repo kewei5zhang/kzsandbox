@@ -30,6 +30,7 @@ jobs:
         with:
           name: "image_tag"
           run-id: $JOB_ID
+          github-token: ${{ secrets.ACTION_READ_TOKEN }}
           path: ./artifacts
         env:
           JOB_ID: ${{ env.JOB_ID }}
