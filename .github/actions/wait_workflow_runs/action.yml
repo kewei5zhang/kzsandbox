@@ -33,7 +33,7 @@ runs:
         fi
       }
 
-      while { check_runs "queued" || check_runs "in_progress" || check_runs "waiting"; }
+      while { check_runs "queued" || check_runs "in_progress" || check_runs "waiting" }
       do
         echo "Waiting 5 seconds before checking queue position again..."
         sleep 5
