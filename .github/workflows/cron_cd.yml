@@ -28,7 +28,6 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: "image_tag"
           run-id:  ${{ env.JOB_ID }}
           # github-token: ${{ secrets.ACTION_READ_TOKEN }}
           path: ./artifacts
