@@ -78,7 +78,8 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.ACTION_READ_TOKEN }}
-      # Step 4: Generate release note
+
+      # Step 5: Generate release note
       - name: Release note
         id: release-note
         shell: bash
@@ -97,7 +98,7 @@ jobs:
             echo "$release_note" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
       
-      # Step 5: Send Slack Notification - Release Notes
+      # Step 6: Send Slack Notification - Release Notes
       - name: Slack notification
         uses: rtCamp/action-slack-notify@v2.2.1
         env:
@@ -112,12 +113,12 @@ jobs:
             ${{ env.RELEASE_NOTE }}
           SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
       
-      # Step 6: Wait for 5 minutes for manual cancel
+      # Step 7: Wait for 5 minutes for manual cancel
       - name: Wait for 5 minutes
         id: wait-for-cancel
         run: sleep 3
 
-      # Step 7: Release Tagging
+      # Step 8: Release Tagging
       - name: Release Tagging
         run: |
           git config --global user.name "GitHub Action"
@@ -127,7 +128,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      # Step 8: Send Slack Notification - Job Starting
+      # Step 9: Send Slack Notification - Job Starting
       - name: Slack notification
         uses: rtCamp/action-slack-notify@v2.2.1
         env:
@@ -140,7 +141,7 @@ jobs:
             *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
           SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
 
-      # Step 9: Approve deployment
+      # Step 10: Approve deployment
       - name: Approve deployment
         shell: bash
         run: |
@@ -158,15 +159,15 @@ jobs:
           ENVIRONMENT_ID: "591606016"
         
       
-      # Step 10: Wait for deploys_all job to finish
+      # Step 11: Wait for deploys_all job to finish
       - name: Wait for deploys_all job to finish
         uses: ./.github/actions/wait_workflow_runs
         id: wait-for-workflow-action
         with:
           github-token: ${{ github.token }}
-          run: ${{ needs.prepare }}
+          run: ${{ needs.prepare.outputs.job_id }}
 
-      # Step 11: Check if deploys_all job is successful
+      # Step 12: Check if deploys_all job is successful
       - name: Check if deploys_all job is successful
         id: check-deploys-all-job
         run: |
@@ -178,7 +179,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-      # Step 12.a: Send Slack Notification - Job Finished - Success
+      # Step 13.a: Send Slack Notification - Job Finished - Success
       - name: Slack notification - Success
         if :  ${{ env.JOB_CONCLUSION == '"success"' }}
         uses: rtCamp/action-slack-notify@v2.2.1
@@ -191,7 +192,7 @@ jobs:
           SLACK_MESSAGE: |
             *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
       
-      # Step 12.b: Send Slack Notification - Job Finished - Failure
+      # Step 13.b: Send Slack Notification - Job Finished - Failure
       - name: Slack notification - Failure
         if : ${{ env.JOB_CONCLUSION == '"failure"' }}
         uses: rtCamp/action-slack-notify@v2.2.1
@@ -204,7 +205,7 @@ jobs:
           SLACK_MESSAGE: |
             *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
 
-      # Step 12.c: Send Slack Notification - Job Finished - Cancelled
+      # Step 13.c: Send Slack Notification - Job Finished - Cancelled
       - name: Slack notification - Cancelled
         if : ${{ always() && cancelled() }}
         uses: rtCamp/action-slack-notify@v2.2.1
