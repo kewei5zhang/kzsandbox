@@ -59,7 +59,9 @@ jobs:
             echo "- **Release notes:**" >> "$GITHUB_STEP_SUMMARY"
             echo "$release_note" >> "$GITHUB_STEP_SUMMARY"
             echo "RELEASE_TAG=$release_tag" >> $GITHUB_ENV
-            echo "RELEASE_NOTE=$release_note" >> $GITHUB_OUTPUT
+            echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
+            echo "$RELEASE_NOTE" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
       
       # Step 5: Send Slack Notification - Release Notes
       - name: Slack notification
@@ -73,7 +75,7 @@ jobs:
           SLACK_MESSAGE: |
             *Release Tag:* ${{ env.RELEASE_TAG }}
             *Release notes:*
-            ${{ steps.release-note.outputs.release_note }}
+            ${{ env.RELEASE_NOTE }}
           SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
 
       # # Step 3: Send Slack notification with release notes
