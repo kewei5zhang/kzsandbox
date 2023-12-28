@@ -150,7 +150,7 @@ jobs:
 
       # Step 12.a: Send Slack Notification - Job Finished - Success
       - name: Slack notification - Success
-        if :  ${{ steps.check-deploys-all-job.outputs.job_conclusion == '"success"' }}
+        if :  ${{ env.JOB_CONCLUSION == '"success"' }}
         uses: rtCamp/action-slack-notify@v2.2.1
         continue-on-error: true
         env:
@@ -162,8 +162,8 @@ jobs:
             *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
       
       # Step 12.b: Send Slack Notification - Job Finished - Failure
-      - name: Slack notification
-        if : ${{ steps.check-deploys-all-job.outputs.job_conclusion == '"failure"' }}
+      - name: Slack notification - Failure
+        if : ${{ env.JOB_CONCLUSION == '"failure"' }}
         uses: rtCamp/action-slack-notify@v2.2.1
         continue-on-error: true
         env:
@@ -175,8 +175,8 @@ jobs:
             *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
 
       # Step 12.c: Send Slack Notification - Job Finished - Cancelled
-      - name: Slack notification
-        if : always() && ${{ steps.wait-for-cancel.outputs.job_conclusion == '"cancelled"'}}
+      - name: Slack notification - Cancelled
+        if : always() && ${{ steps.wait-for-cancel.conclusion == '"cancelled"'}}
         uses: rtCamp/action-slack-notify@v2.2.1
         continue-on-error: true
         env:
