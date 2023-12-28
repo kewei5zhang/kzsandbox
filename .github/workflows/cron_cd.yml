@@ -1,0 +1,76 @@
+name: "cron_cd"
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 9-16 * * 1-5" # ToDo: Run during business hours in the US
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Fetch latest waiting deploys_all job ID
+      - name: Fetch latest waiting deploys_all job ID
+        id: fetch_job_id
+        run: |
+          job_id=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/actions/workflows/deploy_all.yml/runs | jq '[.workflow_runs[] | select(.status == "waiting")][0].id')
+          echo "JOB_ID=$job_id >> $GITHUB_ENV"
+
+      # Step 2: Download Artifact
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image_tag
+          run-id: $JOB_ID
+          path: ./artifacts
+
+      # Step 3: Extract image tag
+      - name: Extract image tag
+        id: extract_image_tag
+        run: |
+          image_tag=$(cat ./artifacts/image_tag.txt)
+          echo "IMAGE_TAG=$image_tag >> $GITHUB_ENV"
+
+      # # Step 3: Send Slack notification with release notes
+      # - name: Send Slack Notification - Release Notes
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_TITLE: "Release Notification"
+      #     SLACK_MESSAGE: "Release notes and image tag fetched. Preparing for deployment."
+      #     SLACK_COLOR: "#36A64F"
+
+      # # Step 4: Waiting for 5 minutes for cancel
+      # - name: Wait for 5 minutes
+      #   run: sleep 300
+
+      # # Step 6: Send Slack Notification - Job Starting
+      # - name: Send Slack Notification - Job Starting
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_TITLE: "Deployment Starting"
+      #     SLACK_MESSAGE: "The deployment job is starting now."
+      #     SLACK_COLOR: "#FFA500"
+
+      # # Step 7: Wait for deploys_all job to finish
+      # # [Add steps to wait for deploys_all job to finish, if needed]
+
+      # # Step 8: Send Slack Notification - Job Finished
+      # - name: Send Slack Notification - Job Finished
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_TITLE: "Deployment Finished"
+      #     SLACK_MESSAGE: "The deployment job has finished."
+      #     SLACK_COLOR: "#008000"
+
+      # # Release Tagging (Based on your script logic)
+      # - name: Release Tagging
+      #   run: |
+      #     # Your script here
