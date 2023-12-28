@@ -20,6 +20,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.ACTION_READ_TOKEN }}
+
       # Step 1: Fetch latest waiting deploys_all job ID
       - name: Fetch latest waiting deploys_all job ID
         id: fetch_job_id
@@ -55,7 +56,7 @@ jobs:
         run: |
             latest_tag="$(git ls-remote --tags origin 'release-v*' | awk -F"/" '{gsub(/\^\{\}/, "", $3); print $3}' | sort -r | head -n 1)"
             commit_to_release="${{ env.IMAGE_TAG }}"
-            release_note="$(git --no-pager log --pretty=oneline --format='%h|%an|%s' $commit_to_release...$latest_tag| column -s\| -t $commit_to_release...$latest_tag)"
+            release_note="$(git --no-pager log --pretty=oneline --format='%h|%an|%s' $commit_to_release...$latest_tag| column -s\| -t)"
             release_tag="release-v0.1.$(date -u +'%Y%m%d%H%M')"
             echo "### Release Info" >> "$GITHUB_STEP_SUMMARY"
             echo "- **Image tag:** $commit_to_release" >> "$GITHUB_STEP_SUMMARY"
@@ -82,7 +83,7 @@ jobs:
             ${{ env.RELEASE_NOTE }}
           SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
       
-      # Step 6: Wait for 5 minutes for cancel
+      # Step 6: Wait for 5 minutes for manual cancel
       - name: Wait for 5 minutes
         id: wait-for-cancel
         run: sleep 3
