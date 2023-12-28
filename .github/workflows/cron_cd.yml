@@ -132,7 +132,7 @@ jobs:
         id: wait-for-workflow-action
         uses: kamilchodola/wait-for-workflow-action@1.1.0
         with:
-          GITHUB_TOKEN: ${{ secrets.ACTION_READ_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           workflow_id: 'deploy.yml'
           run_id: ${{ env.JOB_ID }}
           org_name: ${{ github.repository_owner }}
@@ -147,7 +147,6 @@ jobs:
           SLACK_CHANNEL: "test-slack-integration"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
           SLACK_COLOR: ${{ steps.wait-for-workflow-action.outputs.workflow_status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
-          # SLACK_COLOR: '#808080' # Green for success, Red for failure.
-          SLACK_TITLE: ${{ steps.wait-for-workflow-action.outputs.workflow_status == 'success' && '🎉 Deployed ${{ env.IMAGE_TAG }} successfully' || '🚨 Failed to deploy ${{ env.IMAGE_TAG }}' }}
+          SLACK_TITLE: ${{ steps.wait-for-workflow-action.outputs.workflow_status == 'success' && '🎉 Deployment Success' || '🚨 Deployment Failed' }}
           SLACK_MESSAGE: |
             *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
