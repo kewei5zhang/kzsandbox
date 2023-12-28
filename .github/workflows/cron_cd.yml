@@ -28,7 +28,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: image_tag
-          run-id: ${{ env.JOB_ID }}
+          run-id: 7345823110
           path: ./artifacts
 
       # Step 3: Extract image tag
