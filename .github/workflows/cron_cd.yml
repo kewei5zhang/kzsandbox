@@ -4,15 +4,18 @@ on:
   push:
     branches:
       - master
-  schedule:
-    - cron: "0 9-16 * * 1-5" # ToDo: Run during business hours in the US
+  workflow_dispatch:
 
 permissions:
   actions: write
 
 jobs:
-  deployment:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      job_id: ${{ steps.fetch_job_id.outputs.job_id }}
+      image_tag: ${{ steps.extract_image_tag.outputs.image_tag }}
+      release_needed: ${{ steps.check_release.outputs.release_needed }}
     steps:
       # Step 0: Checkout
       - name: Check Out The Repository
@@ -32,13 +35,13 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/${{ github.repository }}/actions/workflows/deploy_all.yml/runs | jq '[.workflow_runs[] | select(.status == "waiting")][0].id')
           echo $job_id
-          echo "JOB_ID=${job_id}" >> $GITHUB_ENV
+          echo "job_id=${job_id}" >> $GITHUB_OUTPUT
 
       # Step 2: Download Artifact
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          run-id:  ${{ env.JOB_ID }}
+          run-id:  ${{ steps.fetch_job_id.outputs.job_id }}
           github-token: ${{ secrets.ACTION_READ_TOKEN }}
           path: ./artifacts
 
@@ -47,15 +50,33 @@ jobs:
         id: extract_image_tag
         run: |
           image_tag=$(cat ./artifacts/image_tag/image_tag.txt)
-          echo "IMAGE_TAG=${image_tag}" >> $GITHUB_ENV
-
+          echo "image_tag=${image_tag}" >> $GITHUB_OUTPUT
+  
+      # Step 4: Check if new release is needed
+      - name: Check if new release is needed
+        id: check_release
+        run: |
+          # current_short_sha=$(curl -s -H "x-bypass-bot-key: ${{ secrets.CF_X_BYPASS_BOT_KEY }}" https://api-mainnet.magiceden.io/health | jq -r '.version')
+          # current_full_sha=$(git rev-parse "$current_short_sha")
+          current_full_sha="977b2d4fb71826dc514418961701ec335fd0bf87"
+          if [[ git merge-base --is-ancestor $current_full_sha ${{ steps.extract_image_tag.outputs.image_tag }} ]]; then
+            echo "RELEASE_NEEDED=true" >> $GITHUB_OUTPUT
+          else
+            echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
+          fi
+  
+  release: 
+    needs: prepare
+    runs-on: ubuntu-latest
+    if: ${{ needs.prepare.outputs.release_needed == 'true' }}
+    steps:      
       # Step 4: Generate release note
       - name: Release note
         id: release-note
         shell: bash
         run: |
             latest_tag="$(git ls-remote --tags origin 'release-v*' | awk -F"/" '{gsub(/\^\{\}/, "", $3); print $3}' | sort -r | head -n 1)"
-            commit_to_release="${{ env.IMAGE_TAG }}"
+            commit_to_release="${{ needs.prepare.outputs.image_tag }}"
             release_note="$(git --no-pager log --pretty=oneline --format='%h|%an|%s' $commit_to_release...$latest_tag| column -s\| -t)"
             release_tag="release-v0.1.$(date -u +'%Y%m%d%H%M')"
             echo "### Release Info" >> "$GITHUB_STEP_SUMMARY"
@@ -76,7 +97,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
           # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
           SLACK_COLOR: '#808080' # Green for success, Red for failure.
-          SLACK_TITLE: "🕥 Deploying ${{ env.IMAGE_TAG }} in 5 mins"
+          SLACK_TITLE: "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
           SLACK_MESSAGE: |
             *Release Tag:* ${{ env.RELEASE_TAG }}
             *Release notes:*
@@ -93,7 +114,7 @@ jobs:
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "deployer@magiceden.io"
-          git tag -a ${{ env.RELEASE_TAG }} ${{ env.IMAGE_TAG }} -m "New release tag ${{ env.RELEASE_TAG }}"
+          git tag -a ${{ env.RELEASE_TAG }} ${{ needs.prepare.outputs.image_tag }} -m "New release tag ${{ env.RELEASE_TAG }}"
           git push origin ${{ env.RELEASE_TAG }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -106,9 +127,9 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
           # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
           SLACK_COLOR: '#808080' # Green for success, Red for failure.
-          SLACK_TITLE: "🚀 Deploying ${{ env.IMAGE_TAG }} now"
+          SLACK_TITLE: "🚀 Deploying ${{ needs.prepare.outputs.image_tag }} now"
           SLACK_MESSAGE: |
-            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
+            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
           SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
 
       # Step 9: Approve deployment
@@ -122,7 +143,7 @@ jobs:
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}/pending_deployments \
+            /repos/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}/pending_deployments \
             --input <(echo $JSON_DATA)
         env:
           GH_TOKEN: ${{ secrets.ACTION_READ_TOKEN }}
@@ -135,7 +156,7 @@ jobs:
         id: wait-for-workflow-action
         with:
           github-token: ${{ github.token }}
-          run: ${{ env.JOB_ID }}
+          run: ${{ needs.prepare }}
 
       # Step 11: Check if deploys_all job is successful
       - name: Check if deploys_all job is successful
@@ -144,7 +165,7 @@ jobs:
           job_conclusion=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/${{ github.repository }}/actions/runs/${{ env.JOB_ID }} | jq '.conclusion')
+            /repos/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }} | jq '.conclusion')
           echo "JOB_CONCLUSION=${job_conclusion}" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ github.token }}
@@ -160,7 +181,7 @@ jobs:
           SLACK_COLOR: '#2eb886' # Green for success, Red for failure.
           SLACK_TITLE: '🎉 Deployment Success'
           SLACK_MESSAGE: |
-            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
+            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
       
       # Step 12.b: Send Slack Notification - Job Finished - Failure
       - name: Slack notification - Failure
@@ -173,7 +194,7 @@ jobs:
           SLACK_COLOR: '#ff0000' # Green for success, Red for failure.
           SLACK_TITLE: '🚨 Deployment Failed'
           SLACK_MESSAGE: |
-            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
+            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
 
       # Step 12.c: Send Slack Notification - Job Finished - Cancelled
       - name: Slack notification - Cancelled
@@ -186,4 +207,4 @@ jobs:
           SLACK_COLOR: '#808080' # Green for success, Red for failure.
           SLACK_TITLE: '⏹️ Deployment Cancelled'
           SLACK_MESSAGE: |
-            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
+            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
