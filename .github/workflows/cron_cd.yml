@@ -70,11 +70,11 @@ jobs:
       # Step 5: Send Slack Notification - Release Notes
       - name: Slack notification
         uses: rtCamp/action-slack-notify@v2.2.1
-        continue-on-error: true # Continue even if the Slack notification fails.
         env:
           SLACK_CHANNEL: "test-slack-integration"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-          SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
+          # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
+          SLACK_COLOR: '#808080' # Green for success, Red for failure.
           SLACK_TITLE: "🕥 Deploying ${{ env.IMAGE_TAG }} in 5 mins"
           SLACK_MESSAGE: |
             *Release Tag:* ${{ env.RELEASE_TAG }}
@@ -99,11 +99,11 @@ jobs:
       # Step 8: Send Slack Notification - Job Starting
       - name: Slack notification
         uses: rtCamp/action-slack-notify@v2.2.1
-        continue-on-error: true # Continue even if the Slack notification fails.
         env:
           SLACK_CHANNEL: "test-slack-integration"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-          SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
+          # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
+          SLACK_COLOR: '#808080' # Green for success, Red for failure.
           SLACK_TITLE: "🚀 Deploying ${{ env.IMAGE_TAG }} now"
           SLACK_MESSAGE: |
             *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
@@ -126,42 +126,28 @@ jobs:
           GH_TOKEN: ${{ secrets.ACTION_READ_TOKEN }}
           ENVIRONMENT_ID: "591606016"
         
-
-      # # Step 3: Send Slack notification with release notes
-      # - name: Send Slack Notification - Release Notes
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      #     SLACK_TITLE: "Release Notification"
-      #     SLACK_MESSAGE: "Release notes and image tag fetched. Preparing for deployment."
-      #     SLACK_COLOR: "#36A64F"
-
-      # # Step 4: Waiting for 5 minutes for cancel
-      # - name: Wait for 5 minutes
-      #   run: sleep 300
-
-      # # Step 6: Send Slack Notification - Job Starting
-      # - name: Send Slack Notification - Job Starting
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      #     SLACK_TITLE: "Deployment Starting"
-      #     SLACK_MESSAGE: "The deployment job is starting now."
-      #     SLACK_COLOR: "#FFA500"
-
-      # # Step 7: Wait for deploys_all job to finish
-      # # [Add steps to wait for deploys_all job to finish, if needed]
-
-      # # Step 8: Send Slack Notification - Job Finished
-      # - name: Send Slack Notification - Job Finished
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      #     SLACK_TITLE: "Deployment Finished"
-      #     SLACK_MESSAGE: "The deployment job has finished."
-      #     SLACK_COLOR: "#008000"
-
-      # # Release Tagging (Based on your script logic)
-      # - name: Release Tagging
-      #   run: |
-      #     # Your script here
+      
+      # Step 10: Wait for deploys_all job to finish
+      - name: Wait for Workflow Action
+        id: wait-for-workflow-action
+        uses: kamilchodola/wait-for-workflow-action@1.1.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.ACTION_READ_TOKEN }}
+          workflow_id: 'deploy.yml'
+          run_id: ${{ env.JOB_ID }}
+          org_name: ${{ github.repository_owner }}
+          repo_name: kzsandbox
+      
+      # Step 11: Send Slack Notification - Job Finished
+      - name: Slack notification
+        if : ${{ always()}}
+        uses: rtCamp/action-slack-notify@v2.2.1
+        continue-on-error: true
+        env:
+          SLACK_CHANNEL: "test-slack-integration"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
+          SLACK_COLOR: ${{ steps.wait-for-workflow-action.outputs.workflow_status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
+          # SLACK_COLOR: '#808080' # Green for success, Red for failure.
+          SLACK_TITLE: ${{ steps.wait-for-workflow-action.outputs.workflow_status == 'success' && '🎉 Deployed ${{ env.IMAGE_TAG }} successfully' || '🚨 Failed to deploy ${{ env.IMAGE_TAG }}' }}
+          SLACK_MESSAGE: |
+            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
