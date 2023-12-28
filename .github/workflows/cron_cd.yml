@@ -60,7 +60,7 @@ jobs:
             echo "$release_note" >> "$GITHUB_STEP_SUMMARY"
             echo "RELEASE_TAG=$release_tag" >> $GITHUB_ENV
             echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
-            echo "$RELEASE_NOTE" >> $GITHUB_ENV
+            echo "$release_note" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
       
       # Step 5: Send Slack Notification - Release Notes
