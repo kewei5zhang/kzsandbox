@@ -36,6 +36,7 @@ jobs:
       - name: Extract image tag
         id: extract_image_tag
         run: |
+          unzip ./artifacts/artifact.zip -d ./artifacts
           image_tag=$(cat ./artifacts/image_tag.txt)
           echo "IMAGE_TAG=$image_tag >> $GITHUB_ENV"
 
