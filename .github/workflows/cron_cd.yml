@@ -85,7 +85,7 @@ jobs:
       # Step 6: Wait for 5 minutes for cancel
       - name: Wait for 5 minutes
         id: wait-for-cancel
-        run: sleep 60
+        run: sleep 3
 
       # Step 7: Release Tagging
       - name: Release Tagging
@@ -184,3 +184,5 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
           SLACK_COLOR: '#808080' # Green for success, Red for failure.
           SLACK_TITLE: '⏹️ Deployment Cancelled'
+          SLACK_MESSAGE: |
+            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ env.JOB_ID }}
