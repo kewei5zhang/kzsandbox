@@ -133,7 +133,6 @@ jobs:
         id: wait-for-workflow-action
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          workflow: "deploy_all.yml"
           run: ${{ env.JOB_ID }}
 
       # Step 11: Check if deploys_all job is successful
