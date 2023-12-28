@@ -29,7 +29,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           run-id:  ${{ env.JOB_ID }}
-          # github-token: ${{ secrets.ACTION_READ_TOKEN }}
+          github-token: ${{ secrets.ACTION_READ_TOKEN }}
           path: ./artifacts
 
       # Step 3: Extract image tag
