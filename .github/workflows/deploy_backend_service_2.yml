@@ -7,11 +7,11 @@ on:
         type: string
         description: Image tag or commit SHA
         required: true
-  workflow_run:
-    workflows:
-      - deploy_all
-    types:
-      - requested
+  # workflow_run:
+  #   workflows:
+  #     - deploy_all
+  #   types:
+  #     - requested
 
 jobs:
   deploy_to_mainnet:
