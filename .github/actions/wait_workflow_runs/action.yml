@@ -3,13 +3,10 @@ description: |
   This action will wait for any previous runs of the named workflow and
   supplied run number to complete before returning.
 inputs:
-  workflow:
-    description: 'Workflow ID or filename, if omitted will use currently running workflow'
-    required: false
   run:
     description: 'Workflow run number'
     default: ${{ github.run_number }}
-    required: false
+    required: true
   github-token:
     description: 'GitHub access token to perform API calls'
     required: true
@@ -41,7 +38,7 @@ runs:
         workflow="$(get_workflow_id)"
       fi
 
-      while { check_runs queued & check_runs in_progress; }
+      while { check_runs queued | check_runs in_progress; }
       do
         echo "Waiting 5 seconds before checking queue position again..."
         sleep 5
