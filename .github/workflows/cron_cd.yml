@@ -14,6 +14,8 @@ jobs:
       # Step 1: Fetch latest waiting deploys_all job ID
       - name: Fetch latest waiting deploys_all job ID
         id: fetch_job_id
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           job_id=$(gh api \
             -H "Accept: application/vnd.github+json" \
