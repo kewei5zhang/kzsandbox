@@ -20,21 +20,21 @@ jobs:
     steps:
       # - name: Checkout Code
       #   uses: actions/checkout@v3
-      - name: Wait for Image Build
-        shell: bash
-        run: |
-          set +ex
-          WAIT_TIME=0
-          until false > /dev/null;
-          do
-            if [[ $WAIT_TIME -gt 5 ]];
-            then
-              echo "❌ Waiting for image build timeout! megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}"
-            fi
-            echo "🌀 Waiting image build megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}. Checking every 30s..."
-            sleep 5; ((WAIT_TIME++))
-          done
-          echo "✅ Found image tag ${{ inputs.tag }} in repo ${{ inputs.repo }}."
+      # - name: Wait for Image Build
+      #   shell: bash
+      #   run: |
+      #     set +ex
+      #     WAIT_TIME=0
+      #     until false > /dev/null;
+      #     do
+      #       if [[ $WAIT_TIME -gt 5 ]];
+      #       then
+      #         echo "❌ Waiting for image build timeout! megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}"
+      #       fi
+      #       echo "🌀 Waiting image build megabackend:${{ inputs.tag || github.event.workflow_run.head_commit.id }}. Checking every 30s..."
+      #       sleep 5; ((WAIT_TIME++))
+      #     done
+      #     echo "✅ Found image tag ${{ inputs.tag }} in repo ${{ inputs.repo }}."
       - name: Deploy to EKS
         uses: ./.github/actions/deploy_eks
         with:

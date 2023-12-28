@@ -33,6 +33,16 @@ jobs:
           cache-to: type=gha,mode=max
           tags: |
             keweizhang/backend
+      - name: Save image_tag
+        run: |
+          image_tag="${{ github.sha }}"
+          echo "IMAGE_TAG=$image_tag" >> $GITHUB_OUTPUT
+          echo "$image_tag" > image_tag.txt
+      - name: Upload image_tag artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image_tag
+          path: image_tag.txt
       # - name: simulate long build 
       #   run: sleep 90
   # deploy_all_devnet:
