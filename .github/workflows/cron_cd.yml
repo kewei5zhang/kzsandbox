@@ -89,6 +89,8 @@ jobs:
           git config --global user.email "deployer@magiceden.io"
           git tag -a ${{ env.RELEASE_TAG }} ${{ env.IMAGE_TAG }} -m "New release tag ${{ env.RELEASE_TAG }}"
           git push origin ${{ env.RELEASE_TAG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_READ_TOKEN }}
 
       # Step 8: Send Slack Notification - Job Starting
       - name: Slack notification
