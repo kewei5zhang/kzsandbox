@@ -27,15 +27,15 @@ runs:
           /repos/${GITHUB_REPOSITORY}/actions/runs/${{ inputs.run }} | jq -r '.status')
         echo "Current status: $actual_status"
         if [[ "$actual_status" == "$status" ]]; then
-          return true
+          return 0
         else
-          return false
+          return 1
         fi
       }
 
-      while { check_runs queued | check_runs in_progress | check_runs waiting; }
+      while { check_runs "queued" || check_runs "in_progress" || check_runs "waiting"; }
       do
         echo "Waiting 5 seconds before checking queue position again..."
         sleep 5
       done
-      echo "There are no runs waiting or runing, continuing..."
+      echo "There are no runs waiting or running, continuing..."
