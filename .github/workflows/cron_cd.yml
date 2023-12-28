@@ -176,7 +176,7 @@ jobs:
 
       # Step 12.c: Send Slack Notification - Job Finished - Cancelled
       - name: Slack notification
-        if : cancelled() && ${{ steps.check-deploys-all-job.outputs.job_conclusion == '"cancelled"' }}
+        if : always() && ${{ steps.wait-for-cancel.outputs.job_conclusion == '"cancelled"'}}
         uses: rtCamp/action-slack-notify@v2.2.1
         continue-on-error: true
         env:
