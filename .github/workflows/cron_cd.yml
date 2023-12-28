@@ -132,7 +132,7 @@ jobs:
         uses: ./.github/actions/wait_workflow_runs
         id: wait-for-workflow-action
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
           run: ${{ env.JOB_ID }}
 
       # Step 11: Check if deploys_all job is successful
