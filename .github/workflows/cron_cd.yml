@@ -60,11 +60,11 @@ jobs:
           current_full_sha="977b2d4fb71826dc514418961701ec335fd0bf87"
           echo "current_full_sha=${current_full_sha}"
           echo "image_tag=${{ steps.extract_image_tag.outputs.image_tag }}"
-          if [[ $current_full_sha == "977b2d4fb71826dc514418961701ec335fd0bf87" ]]; then
-            echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
-          elif git merge-base --is-ancestor $current_full_sha ${{ steps.extract_image_tag.outputs.image_tag }}; then
+          if [[ $current_full_sha == ${{ steps.extract_image_tag.outputs.image_tag }} ]]; then
             echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
             echo "No new release needed" >> "$GITHUB_STEP_SUMMARY"
+          elif git merge-base --is-ancestor $current_full_sha ${{ steps.extract_image_tag.outputs.image_tag }}; then
+            echo "RELEASE_NEEDED=true" >> $GITHUB_OUTPUT
           else
             echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
             echo "No new release needed" >> "$GITHUB_STEP_SUMMARY"
