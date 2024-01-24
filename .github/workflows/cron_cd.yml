@@ -37,7 +37,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          run-id:  ${{ steps.fetch_job_id.outputs.job_id }}
+          run-id: ${{ steps.fetch_job_id.outputs.job_id }}
           github-token: ${{ secrets.ACTION_READ_TOKEN }}
           path: ./artifacts
 
@@ -47,7 +47,7 @@ jobs:
         run: |
           image_tag=$(cat ./artifacts/image_tag/image_tag.txt)
           echo "image_tag=${image_tag}" >> $GITHUB_OUTPUT
-  
+
       # Step 4: Check if new release is needed
       - name: Check if new release is needed
         id: check_release
@@ -67,12 +67,12 @@ jobs:
             echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
             echo "No new release needed" >> "$GITHUB_STEP_SUMMARY"
           fi
-  
-  release: 
+
+  release:
     needs: prepare
     runs-on: ubuntu-latest
     if: ${{ needs.prepare.outputs.release_needed == 'true' }}
-    steps:      
+    steps:
       # Step 0: Checkout
       - name: Check Out The Repository
         uses: actions/checkout@v3
@@ -85,35 +85,66 @@ jobs:
         id: release-note
         shell: bash
         run: |
-            latest_tag="$(git ls-remote --tags origin 'release-v*' | awk -F"/" '{gsub(/\^\{\}/, "", $3); print $3}' | sort -r | head -n 1)"
-            commit_to_release="${{ needs.prepare.outputs.image_tag }}"
-            release_note="$(git --no-pager log --pretty=oneline --format='%h|%an|%s' $commit_to_release...$latest_tag| column -s\| -t)"
-            release_tag="release-v0.1.$(date -u +'%Y%m%d%H%M')"
-            echo "### Release Info" >> "$GITHUB_STEP_SUMMARY"
-            echo "- **Image tag:** $commit_to_release" >> "$GITHUB_STEP_SUMMARY"
-            echo "- **Release tag:** $release_tag" >> "$GITHUB_STEP_SUMMARY"
-            echo "- **Release notes:**" >> "$GITHUB_STEP_SUMMARY"
-            echo "$release_note" >> "$GITHUB_STEP_SUMMARY"
-            echo "RELEASE_TAG=$release_tag" >> $GITHUB_ENV
-            echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
-            echo "$release_note" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
-      
+          latest_tag="$(git ls-remote --tags origin 'release-v*' | awk -F"/" '{gsub(/\^\{\}/, "", $3); print $3}' | sort -r | head -n 1)"
+          commit_to_release="${{ needs.prepare.outputs.image_tag }}"
+          release_note="$(git --no-pager log --pretty=oneline --format='%h|%an|%s' $commit_to_release...$latest_tag| column -s\| -t)"
+          release_tag="release-v0.1.$(date -u +'%Y%m%d%H%M')"
+          echo "### Release Info" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Image tag:** $commit_to_release" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Release tag:** $release_tag" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Release notes:**" >> "$GITHUB_STEP_SUMMARY"
+          echo "$release_note" >> "$GITHUB_STEP_SUMMARY"
+          echo "RELEASE_TAG=$release_tag" >> $GITHUB_ENV
+          echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
+          echo "$release_note" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
       # Step 6: Send Slack Notification - Release Notes
-      - name: Slack notification
-        uses: rtCamp/action-slack-notify@v2.2.1
+      - name: Send Slack notification
+        # id: slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
+                  },
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Release Tag:*\n${{ env.RELEASE_TAG }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Release notes:*\n${{ env.RELEASE_NOTE }}"
+                    }
+                  ]
+                }
+              ]
+            }
         env:
-          SLACK_CHANNEL: "test-slack-integration"
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-          # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
-          SLACK_COLOR: '#808080' # Green for success, Red for failure.
-          SLACK_TITLE: "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
-          SLACK_MESSAGE: |
-            *Release Tag:* ${{ env.RELEASE_TAG }}
-            *Release notes:*
-            ${{ env.RELEASE_NOTE }}
-          SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
-      
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      # - name: Slack notification
+      #   uses: rtCamp/action-slack-notify@v2.2.1
+      #   env:
+      #     SLACK_CHANNEL: "test-slack-integration"
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
+      #     # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
+      #     SLACK_COLOR: '#808080' # Green for success, Red for failure.
+      #     SLACK_TITLE: "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
+      #     SLACK_MESSAGE: |
+      #       *Release Tag:* ${{ env.RELEASE_TAG }}
+      #       *Release notes:*
+      #       ${{ env.RELEASE_NOTE }}
+      #     SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
+
       # Step 7: Wait for 5 minutes for manual cancel
       - name: Wait for 5 minutes
         id: wait-for-cancel
@@ -130,17 +161,45 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       # Step 9: Send Slack Notification - Job Starting
-      - name: Slack notification
-        uses: rtCamp/action-slack-notify@v2.2.1
+      # - name: Slack notification
+      #   uses: rtCamp/action-slack-notify@v2.2.1
+      #   env:
+      #     SLACK_CHANNEL: "test-slack-integration"
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
+      #     # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
+      #     SLACK_COLOR: "#808080" # Green for success, Red for failure.
+      #     SLACK_TITLE: "🚀 Deploying ${{ needs.prepare.outputs.image_tag }} now"
+      #     SLACK_MESSAGE: |
+      #       *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
+      #     SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
+      - name: Send Slack notification
+        id: slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "🚀 Deploying ${{ needs.prepare.outputs.image_tag }} now",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🚀 Deploying ${{ needs.prepare.outputs.image_tag }} now"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Deploys all job link"
+                    },
+                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}"
+                  }
+                }
+              ]
+            }
         env:
-          SLACK_CHANNEL: "test-slack-integration"
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-          # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
-          SLACK_COLOR: '#808080' # Green for success, Red for failure.
-          SLACK_TITLE: "🚀 Deploying ${{ needs.prepare.outputs.image_tag }} now"
-          SLACK_MESSAGE: |
-            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
-          SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       # Step 10: Approve deployment
       - name: Approve deployment
@@ -158,8 +217,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ACTION_READ_TOKEN }}
           ENVIRONMENT_ID: "591606016"
-        
-      
+
       # Step 11: Wait for deploys_all job to finish
       - name: Wait for deploys_all job to finish
         uses: ./.github/actions/wait_workflow_runs
@@ -182,40 +240,129 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       # Step 13.a: Send Slack Notification - Job Finished - Success
-      - name: Slack notification - Success
-        if :  ${{ env.JOB_CONCLUSION == '"success"' }}
-        uses: rtCamp/action-slack-notify@v2.2.1
-        continue-on-error: true
+      # - name: Slack notification - Success
+      #   if: ${{ env.JOB_CONCLUSION == '"success"' }}
+      #   uses: rtCamp/action-slack-notify@v2.2.1
+      #   continue-on-error: true
+      #   env:
+      #     SLACK_CHANNEL: "test-slack-integration"
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
+      #     SLACK_COLOR: "#2eb886" # Green for success, Red for failure.
+      #     SLACK_TITLE: "🎉 Deployment Success"
+      #     SLACK_MESSAGE: |
+      #       *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
+      - name: Send Slack notification - Success
+        if: ${{ env.JOB_CONCLUSION == 'success' }}
+        id: slack-success
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          update-ts: ${{ steps.slack.outputs.ts }}
+          payload: |
+            {
+              "text": "🎉 Deployment Success",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🎉 Deployment Success"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Deploys all job link"
+                    },
+                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}"
+                  }
+                }
+              ]
+            }
         env:
-          SLACK_CHANNEL: "test-slack-integration"
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-          SLACK_COLOR: '#2eb886' # Green for success, Red for failure.
-          SLACK_TITLE: '🎉 Deployment Success'
-          SLACK_MESSAGE: |
-            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
-      
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
       # Step 13.b: Send Slack Notification - Job Finished - Failure
-      - name: Slack notification - Failure
-        if : ${{ env.JOB_CONCLUSION == '"failure"' }}
-        uses: rtCamp/action-slack-notify@v2.2.1
-        continue-on-error: true
+      # - name: Slack notification - Failure
+      #   if: ${{ env.JOB_CONCLUSION == '"failure"' }}
+      #   uses: rtCamp/action-slack-notify@v2.2.1
+      #   continue-on-error: true
+      #   env:
+      #     SLACK_CHANNEL: "test-slack-integration"
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
+      #     SLACK_COLOR: "#ff0000" # Green for success, Red for failure.
+      #     SLACK_TITLE: "🚨 Deployment Failed"
+      #     SLACK_MESSAGE: |
+      #       *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
+      - name: Send Slack notification - Failure
+        if: ${{ env.JOB_CONCLUSION == 'failure' }}
+        id: slack-failure
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          update-ts: ${{ steps.slack.outputs.ts }}
+          payload: |
+            {
+              "text": "🚨 Deployment Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🚨 Deployment Failed"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Deploys all job link"
+                    },
+                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}"
+                  }
+                }
+              ]
+            }
         env:
-          SLACK_CHANNEL: "test-slack-integration"
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-          SLACK_COLOR: '#ff0000' # Green for success, Red for failure.
-          SLACK_TITLE: '🚨 Deployment Failed'
-          SLACK_MESSAGE: |
-            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       # Step 13.c: Send Slack Notification - Job Finished - Cancelled
-      - name: Slack notification - Cancelled
-        if : ${{ always() && cancelled() }}
-        uses: rtCamp/action-slack-notify@v2.2.1
-        continue-on-error: true
+      # - name: Slack notification - Cancelled
+      #   if: ${{ always() && cancelled() }}
+      #   uses: rtCamp/action-slack-notify@v2.2.1
+      #   continue-on-error: true
+      #   env:
+      #     SLACK_CHANNEL: "test-slack-integration"
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
+      #     SLACK_COLOR: "#808080" # Green for success, Red for failure.
+      #     SLACK_TITLE: "⏹️ Deployment Cancelled"
+      #     SLACK_MESSAGE: |
+      #       *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
+      - name: Send Slack notification - Cancelled
+        if: ${{ always() && cancelled() }}
+        id: slack-cancelled
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "⏹️ Deployment Cancelled",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "⏹️ Deployment Cancelled"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Deploys all job link"
+                    },
+                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}"
+                  }
+                }
+              ]
+            }
         env:
-          SLACK_CHANNEL: "test-slack-integration"
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-          SLACK_COLOR: '#808080' # Green for success, Red for failure.
-          SLACK_TITLE: '⏹️ Deployment Cancelled'
-          SLACK_MESSAGE: |
-            *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
