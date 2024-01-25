@@ -6,9 +6,6 @@ on:
       - master
   workflow_dispatch:
 
-permissions:
-  actions: write
-
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -22,6 +19,7 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
+          token: ${{ secrets.ACTION_READ_TOKEN }}
 
       # Step 1: Fetch latest waiting deploys_all job ID
       - name: Fetch latest waiting deploys_all job ID
