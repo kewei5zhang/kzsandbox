@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
+          token: ${{ secrets.ACTION_READ_TOKEN }}
 
       # Step 1: Fetch latest waiting deploys_all job ID
       - name: Fetch latest waiting deploys_all job ID
@@ -95,9 +96,9 @@ jobs:
           echo "- **Release notes:**" >> "$GITHUB_STEP_SUMMARY"
           echo "$release_note" >> "$GITHUB_STEP_SUMMARY"
           echo "RELEASE_TAG=$release_tag" >> $GITHUB_ENV
-          # Use jq to escape multiline release note
-          release_note_escaped="$(echo "$release_note" | jq -s -R -r @uri)"
-          echo "RELEASE_NOTE=$release_note_escaped" >> $GITHUB_ENV
+          echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
+          echo "$release_note" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       # Step 6: Send Slack Notification - Release Notes
       - name: Send Slack notification
@@ -121,7 +122,7 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Release notes:*\n${{ env.RELEASE_NOTE }}"
+                      "text": "*Release notes:*\n${{ toJson(env.RELEASE_NOTE) }}"
                     }
                   ]
                 }
@@ -160,18 +161,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      # Step 9: Send Slack Notification - Job Starting
-      # - name: Slack notification
-      #   uses: rtCamp/action-slack-notify@v2.2.1
-      #   env:
-      #     SLACK_CHANNEL: "test-slack-integration"
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-      #     # SLACK_COLOR: ${{ job.status == 'success' && '#2eb886' || '#ff0000' }} # Green for success, Red for failure.
-      #     SLACK_COLOR: "#808080" # Green for success, Red for failure.
-      #     SLACK_TITLE: "🚀 Deploying ${{ needs.prepare.outputs.image_tag }} now"
-      #     SLACK_MESSAGE: |
-      #       *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
-      #     SLACK_USERNAME: deployment bot # Customize the Slack username sending the message.
       - name: Send Slack notification
         id: slack
         uses: slackapi/slack-github-action@v1.24.0
@@ -239,18 +228,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-      # Step 13.a: Send Slack Notification - Job Finished - Success
-      # - name: Slack notification - Success
-      #   if: ${{ env.JOB_CONCLUSION == '"success"' }}
-      #   uses: rtCamp/action-slack-notify@v2.2.1
-      #   continue-on-error: true
-      #   env:
-      #     SLACK_CHANNEL: "test-slack-integration"
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-      #     SLACK_COLOR: "#2eb886" # Green for success, Red for failure.
-      #     SLACK_TITLE: "🎉 Deployment Success"
-      #     SLACK_MESSAGE: |
-      #       *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
       - name: Send Slack notification - Success
         if: ${{ env.JOB_CONCLUSION == 'success' }}
         id: slack-success
@@ -282,18 +259,6 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-      # Step 13.b: Send Slack Notification - Job Finished - Failure
-      # - name: Slack notification - Failure
-      #   if: ${{ env.JOB_CONCLUSION == '"failure"' }}
-      #   uses: rtCamp/action-slack-notify@v2.2.1
-      #   continue-on-error: true
-      #   env:
-      #     SLACK_CHANNEL: "test-slack-integration"
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-      #     SLACK_COLOR: "#ff0000" # Green for success, Red for failure.
-      #     SLACK_TITLE: "🚨 Deployment Failed"
-      #     SLACK_MESSAGE: |
-      #       *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
       - name: Send Slack notification - Failure
         if: ${{ env.JOB_CONCLUSION == 'failure' }}
         id: slack-failure
@@ -325,18 +290,6 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-      # Step 13.c: Send Slack Notification - Job Finished - Cancelled
-      # - name: Slack notification - Cancelled
-      #   if: ${{ always() && cancelled() }}
-      #   uses: rtCamp/action-slack-notify@v2.2.1
-      #   continue-on-error: true
-      #   env:
-      #     SLACK_CHANNEL: "test-slack-integration"
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }} # Ensure you have set this secret in the repository under the target environment.
-      #     SLACK_COLOR: "#808080" # Green for success, Red for failure.
-      #     SLACK_TITLE: "⏹️ Deployment Cancelled"
-      #     SLACK_MESSAGE: |
-      #       *Deploys all job link:* https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}
       - name: Send Slack notification - Cancelled
         if: ${{ always() && cancelled() }}
         id: slack-cancelled
