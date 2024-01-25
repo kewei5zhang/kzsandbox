@@ -188,7 +188,7 @@ jobs:
       # Step 7: Wait for 5 minutes for manual cancel
       - name: Wait for 5 minutes
         id: wait-for-cancel
-        run: sleep 3
+        run: sleep 60
 
       # Step 8: Release Tagging
       - name: Release Tagging
