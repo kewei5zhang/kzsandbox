@@ -122,7 +122,6 @@ jobs:
 
       # Step 6: Send Slack Notification - Release Notes
       - name: Send Slack notification
-        # id: slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
@@ -134,22 +133,28 @@ jobs:
                   "text": {
                     "type": "mrkdwn",
                     "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
-                  },
+                  }
+                },
+                {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
                     "text": "*Release Tag:*\n${{ env.RELEASE_TAG }}"
-                  },
-                  type: "section",
+                  }
+                },
+                {
+                  "type": "section",
                   "text": {
                     "type": "mrkdwn",
                     "text": ${{ toJson(env.RELEASE_NOTE) }}
-                },
+                  }
+                }
               ]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
 
       # Step 7: Wait for 5 minutes for manual cancel
       - name: Wait for 5 minutes
