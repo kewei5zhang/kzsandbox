@@ -136,15 +136,26 @@ jobs:
                     "type": "mrkdwn",
                     "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
                   }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Cancel Deployment"
+                      },
+                      "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
                 }
               ]
             }
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          # SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          # SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-      # Step 6: Send Slack Notification - Release Notes
+          # Step 6: Send Slack Notification - Release Notes
       - name: Send Slack notification - Release Notes
         uses: slackapi/slack-github-action@v1.24.0
         with:
