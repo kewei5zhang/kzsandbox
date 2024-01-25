@@ -346,7 +346,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "⏹️ Deployment Cancelled ${{ needs.prepare.outputs.image_tag }}"
+                    "text": "⏹️ Deployment Cancelled ${{ needs.prepare.outputs.image_tag }}. Release tag ${{ env.RELEASE_TAG }} is not created."
                   },
                   "accessory": {
                     "type": "button",
