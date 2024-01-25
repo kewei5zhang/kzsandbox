@@ -68,6 +68,26 @@ jobs:
             echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
             echo "No new release needed" >> "$GITHUB_STEP_SUMMARY"
           fi
+      
+      # # Step 5: Check if prisma schema has changed
+      # - name: Check if prisma schema has changed
+      #   id: check_prisma_schema
+      #   run: |
+      #     # current_short_sha=$(curl -s -H "x-bypass-bot-key: ${{ secrets.CF_X_BYPASS_BOT_KEY }}" https://api-mainnet.magiceden.io/health | jq -r '.version')
+      #     # current_full_sha=$(git rev-parse "$current_short_sha")
+      #     current_full_sha="977b2d4fb71826dc514418961701ec335fd0bf87"
+      #     echo "current_full_sha=${current_full_sha}"
+      #     echo "image_tag=${{ steps.extract_image_tag.outputs.image_tag }}"
+      #     if [[ $current_full_sha == ${{ steps.extract_image_tag.outputs.image_tag }} ]]; then
+      #       echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
+      #       echo "No new release needed" >> "$GITHUB_STEP_SUMMARY"
+      #     elif git merge-base --is-ancestor $current_full_sha ${{ steps.extract_image_tag.outputs.image_tag }}; then
+      #       echo "RELEASE_NEEDED=true" >> $GITHUB_OUTPUT
+      #       echo "New release needed" >> "$GITHUB_STEP_SUMMARY"
+      #     else
+      #       echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
+      #       echo "No new release needed" >> "$GITHUB_STEP_SUMMARY"
+      #     fi
 
   release:
     needs: prepare
@@ -124,9 +144,7 @@ jobs:
                   "text": {
                     "type": "mrkdwn",
                     "text": ${{ toJson(env.RELEASE_NOTE) }}
-                  },
-                  ]
-                }
+                },
               ]
             }
         env:
