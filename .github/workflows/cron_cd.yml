@@ -265,7 +265,7 @@ jobs:
 
       - name: Send Slack notification - Success
         id: slack-success
-        if: ${{ env.JOB_CONCLUSION == 'success' }}
+        # if: ${{ env.JOB_CONCLUSION == 'success' }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: "C04KK1ZPQEN" #test-slack-integration
