@@ -6,6 +6,9 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  actions: write
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -16,7 +19,7 @@ jobs:
     steps:
       # Step 0: Checkout
       - name: Check Out The Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
 
@@ -75,7 +78,7 @@ jobs:
     steps:
       # Step 0: Checkout
       - name: Check Out The Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
           # token: ${{ secrets.ACTION_READ_TOKEN }}

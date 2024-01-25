@@ -29,7 +29,7 @@ jobs:
             valuefile: scripts
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
       - name: sleep
         run: sleep 60
         # - name: Wait for build to succeed
@@ -57,7 +57,7 @@ jobs:
   #   needs: [deploy_all_to_mainnet]
   #   environment: Production
   #   steps:
-  #   - uses: actions/checkout@v3
+  #   - uses: actions/checkout@v4.1.1
   #   - name: Mimic Deployment
   #     run: |
   #       echo "Deploying Mainnet ..."
