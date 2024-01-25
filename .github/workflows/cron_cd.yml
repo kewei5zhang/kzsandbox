@@ -123,7 +123,7 @@ jobs:
                   type: "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Release Notes:*\n${{ toJson(env.RELEASE_NOTE) }}"
+                    "text": ${{ toJson(env.RELEASE_NOTE) }}
                   },
                   ]
                 }
