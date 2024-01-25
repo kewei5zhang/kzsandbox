@@ -135,7 +135,7 @@ jobs:
                     "type": "mrkdwn",
                     "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
                   }
-                },
+                }
               ]
             }
         env:
