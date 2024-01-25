@@ -305,6 +305,7 @@ jobs:
         if: steps.check-deploys-all-job.conclusion == 'failure'
         uses: slackapi/slack-github-action@v1.24.0
         with:
+          channel-id: "C04KK1ZPQEN" #test-slack-integration
           update-ts: ${{ steps.slack-deploying.outputs.ts }}
           payload: |
             {
@@ -335,6 +336,7 @@ jobs:
         id: slack-cancelled
         uses: slackapi/slack-github-action@v1.24.0
         with:
+          channel-id: "C04KK1ZPQEN" #test-slack-integration
           update-ts: ${{ steps.slack-deploying.outputs.ts }}
           payload: |
             {
