@@ -115,15 +115,16 @@ jobs:
                     "type": "mrkdwn",
                     "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
                   },
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Release Tag:*\n${{ env.RELEASE_TAG }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": ${{ toJson(env.RELEASE_NOTE) }}
-                    }
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Release Tag:*\n${{ env.RELEASE_TAG }}"
+                  },
+                  type: "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Release Notes:*\n${{ toJson(env.RELEASE_NOTE) }}"
+                  },
                   ]
                 }
               ]
@@ -211,12 +212,17 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }} | jq '.conclusion')
           echo "JOB_CONCLUSION=${job_conclusion}" >> $GITHUB_ENV
+          echo "JOB_CONCLUSION=${job_conclusion}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: print JOB_CONCLUSION
+        run: |
+          echo ${{ env.JOB_CONCLUSION }}
+
       - name: Send Slack notification - Success
-        if: ${{ env.JOB_CONCLUSION == 'success' }}
         id: slack-success
+        if: ${{ env.JOB_CONCLUSION == 'success' }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
           update-ts: ${{ steps.slack.outputs.ts }}
