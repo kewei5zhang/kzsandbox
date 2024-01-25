@@ -96,9 +96,9 @@ jobs:
           echo "- **Release notes:**" >> "$GITHUB_STEP_SUMMARY"
           echo "$release_note" >> "$GITHUB_STEP_SUMMARY"
           echo "RELEASE_TAG=$release_tag" >> $GITHUB_ENV
-          echo "RELEASE_NOTE<<EOF" >> $GITHUB_ENV
-          echo "$release_note" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          # Use jq to escape multiline release note
+          release_note_escaped="$(echo "$release_note" | jq -s -R -r @uri)"
+          echo "RELEASE_NOTE=$release_note_escaped" >> $GITHUB_ENV
 
       # Step 6: Send Slack Notification - Release Notes
       - name: Send Slack notification
