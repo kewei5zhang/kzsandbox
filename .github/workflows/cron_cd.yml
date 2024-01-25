@@ -254,14 +254,9 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }} | jq '.conclusion')
-          echo "JOB_CONCLUSION=${job_conclusion}" >> $GITHUB_ENV
           echo "JOB_CONCLUSION=${job_conclusion}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
-
-      - name: print JOB_CONCLUSION
-        run: |
-          echo ${{ env.JOB_CONCLUSION }}
 
       - name: Send Slack notification - Success
         id: slack-success
@@ -278,7 +273,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🎉 Deployment Success"
+                    "text": "🎉 Deployment Successfully ${{ needs.prepare.outputs.image_tag }}"
                   },
                   "accessory": {
                     "type": "button",
@@ -293,69 +288,63 @@ jobs:
             }
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          # JOB_CONCLUSION: ${{ env.JOB_CONCLUSION }}
-          # SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          # SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-      # - name: Send Slack notification - Failure
-      #   if: env.JOB_CONCLUSION == 'failure'
-      #   id: slack-failure
-      #   uses: slackapi/slack-github-action@v1.24.0
-      #   with:
-      #     update-ts: ${{ steps.slack-deploying.outputs.ts }}
-      #     payload: |
-      #       {
-      #         "text": "🚨 Deployment Failed",
-      #         "blocks": [
-      #           {
-      #             "type": "section",
-      #             "text": {
-      #               "type": "mrkdwn",
-      #               "text": "🚨 Deployment Failed"
-      #             },
-      #             "accessory": {
-      #               "type": "button",
-      #               "text": {
-      #                 "type": "plain_text",
-      #                 "text": "Deploys all job link"
-      #               },
-      #               "url": "https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}"
-      #             }
-      #           }
-      #         ]
-      #       }
-      #   env:
-      #     JOB_CONCLUSION: ${{ env.JOB_CONCLUSION }}
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-      #     SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: Send Slack notification - Failure
+        id: slack-failure
+        if: steps.check-deploys-all-job.conclusion == 'failure'
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          update-ts: ${{ steps.slack-deploying.outputs.ts }}
+          payload: |
+            {
+              "text": "🚨 Deployment Failed ${{ needs.prepare.outputs.image_tag }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🚨 Deployment Failed ${{ needs.prepare.outputs.image_tag }}"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Deploys all job link"
+                    },
+                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-      # - name: Send Slack notification - Cancelled
-      #   if: always() && cancelled()
-      #   id: slack-cancelled
-      #   uses: slackapi/slack-github-action@v1.24.0
-      #   with:
-      #     update-ts: ${{ steps.slack-deploying.outputs.ts }}
-      #     payload: |
-      #       {
-      #         "text": "⏹️ Deployment Cancelled",
-      #         "blocks": [
-      #           {
-      #             "type": "section",
-      #             "text": {
-      #               "type": "mrkdwn",
-      #               "text": "⏹️ Deployment Cancelled"
-      #             },
-      #             "accessory": {
-      #               "type": "button",
-      #               "text": {
-      #                 "type": "plain_text",
-      #                 "text": "Deploys all job link"
-      #               },
-      #               "url": "https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}"
-      #             }
-      #           }
-      #         ]
-      #       }
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-      #     SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: Send Slack notification - Cancelled
+        if: always() && cancelled()
+        id: slack-cancelled
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          update-ts: ${{ steps.slack-deploying.outputs.ts }}
+          payload: |
+            {
+              "text": "⏹️ Deployment Cancelled ${{ needs.prepare.outputs.image_tag }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "⏹️ Deployment Cancelled ${{ needs.prepare.outputs.image_tag }}"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Deploys all job link"
+                    },
+                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
