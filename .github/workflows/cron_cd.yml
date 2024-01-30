@@ -19,7 +19,6 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
-          token: ${{ secrets.ACTION_READ_TOKEN }}
 
       # Step 1: Fetch latest waiting deploys_all job ID
       - name: Fetch latest waiting deploys_all job ID
@@ -68,7 +67,7 @@ jobs:
             echo "RELEASE_NEEDED=false" >> $GITHUB_OUTPUT
             echo "No new release needed" >> "$GITHUB_STEP_SUMMARY"
           fi
-      
+
       # # Step 5: Check if prisma schema has changed
       # - name: Check if prisma schema has changed
       #   id: check_prisma_schema
@@ -99,7 +98,6 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
-          token: ${{ secrets.ACTION_READ_TOKEN }}
 
       # Step 5: Generate release note
       - name: Release note
@@ -125,7 +123,8 @@ jobs:
         id: slack-deploying
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: "C04KK1ZPQEN" #test-slack-integration
+          # channel-id: "C04KK1ZPQEN" #test-slack-integration
+          channel-id: "C05QY3GP683" #deployment-notification-test
           payload: |
             {
               "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins",
@@ -159,7 +158,8 @@ jobs:
       - name: Send Slack notification - Release Notes
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: "C04KK1ZPQEN" #test-slack-integration
+          # channel-id: "C04KK1ZPQEN" #test-slack-integration
+          channel-id: "C05QY3GP683" #deployment-notification-test
           payload: |
             {
               "text": "*Release Tag:*\n${{ env.RELEASE_TAG }}",
@@ -203,7 +203,8 @@ jobs:
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: "C04KK1ZPQEN" #test-slack-integration
+          # channel-id: "C04KK1ZPQEN" #test-slack-integration
+          channel-id: "C05QY3GP683" #deployment-notification-test
           update-ts: ${{ steps.slack-deploying.outputs.ts }}
           payload: |
             {
@@ -274,7 +275,8 @@ jobs:
         if: steps.check-deploys-all-job.conclusion == 'success'
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: "C04KK1ZPQEN" #test-slack-integration
+          # channel-id: "C04KK1ZPQEN" #test-slack-integration
+          channel-id: "C05QY3GP683" #deployment-notification-test
           update-ts: ${{ steps.slack-deploying.outputs.ts }}
           payload: |
             {
@@ -305,7 +307,8 @@ jobs:
         if: steps.check-deploys-all-job.conclusion == 'failure'
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: "C04KK1ZPQEN" #test-slack-integration
+          # channel-id: "C04KK1ZPQEN" #test-slack-integration
+          channel-id: "C05QY3GP683" #deployment-notification-test
           update-ts: ${{ steps.slack-deploying.outputs.ts }}
           payload: |
             {
@@ -336,7 +339,8 @@ jobs:
         id: slack-cancelled
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: "C04KK1ZPQEN" #test-slack-integration
+          # channel-id: "C04KK1ZPQEN" #test-slack-integration
+          channel-id: "C05QY3GP683" #deployment-notification-test
           update-ts: ${{ steps.slack-deploying.outputs.ts }}
           payload: |
             {
