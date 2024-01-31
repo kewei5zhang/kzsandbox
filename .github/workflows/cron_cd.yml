@@ -94,22 +94,27 @@ jobs:
       - name: Calculate Run Position
         id: run_position
         run: |
+          # Determine the current hour
           HOUR=$(date +"%H")
           POSITION=0
-          if [ "$HOUR" -eq 1 ]; then
-            POSITION=1 # 10 AM PST
-          elif [ "$HOUR" -eq 20 ]; then
-            POSITION=2 # 12 PM PST
-          elif [ "$HOUR" -eq 22 ]; then
-            POSITION=3 # 2 PM PST
-          elif [ "$HOUR" -eq 3 ]; then
-            POSITION=4 # 4 PM PST
-          fi
+          
+          # Map the current hour to the deployment schedule
+          case $HOUR in
+            1)  POSITION=1 ;; # 10 AM PST
+            20) POSITION=2 ;; # 12 PM PST
+            22) POSITION=3 ;; # 2 PM PST
+            3)  POSITION=4 ;; # 4 PM PST
+          esac
+          
+          # Output the run position
           echo "run_position=${POSITION}" >> $GITHUB_OUTPUT
+          
+          # Determine the message based on the run position
           if [ $POSITION -lt 4 ]; then
-          echo "next_deploy_msg=The next deployment is scheduled in two hours." >> $GITHUB_OUTPUT
+            echo "next_deploy_msg=The next deployment is scheduled in two hours." >> $GITHUB_OUTPUT
           else
-          echo "next_deploy_msg=This is the last deployment for today." >> $GITHUB_OUTPUT
+            echo "next_deploy_msg=This is the last deployment for today." >> $GITHUB_OUTPUT
+          fi
 
   release:
     needs: prepare
