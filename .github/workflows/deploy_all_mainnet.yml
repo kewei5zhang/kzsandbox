@@ -15,16 +15,21 @@ on:
         required: true
 jobs:
   deploy_all_to_mainnet:
-    name: Deploy to Mainnet
+    # outputs:
+    #   tag: ${{ steps.check-outcome.outputs.success }}
     runs-on: ubuntu-latest
     environment: Production
+    # continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         include:
           - release: acct-broker
             valuefile: ./mainnet/acct-broker-values.yaml
           - release: acct-backfill-broker
             valuefile: ./mainnet/acct-backfill-broker-values.yaml
+          - release: acct-backfill
+            valuefile: ./mainnet/acct-backfill-values.yaml
           - release: scripts
             valuefile: scripts
     steps:
@@ -50,7 +55,34 @@ jobs:
           chart: js/packages/backend
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           token: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Set Job Outcome
+      #   id: check-outcome
+      #   run: |
+      #     if [ ${{ job.status }} == 'success' ]; then
+      #       echo "success=true" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "success=false" >> $GITHUB_OUTPUT
+      #     fi
 
+  # check-failure:
+  #   runs-on: ubuntu-latest
+  #   needs: deploy_all_to_mainnet
+  #   if: always()
+  #   steps:
+  #     - name: Check for Failure in Matrix Jobs
+  #       run: |
+  #         failed=false
+  #         for job in ${{ toJson(needs.deploy_all_to_mainnet.results) }}; do
+  #           if [ $job == 'failure' ]; then
+  #             failed=true
+  #             break
+  #           fi
+  #         done
+  #         echo "Failed: $failed"
+  #         if [ $failed == true ]; then
+  #           echo "One or more jobs failed."
+  #           exit 1
+  #         fi
   # deploy_to_frontend_mainnet:
   #   name: Deploy to Frontend Mainnet
   #   runs-on: ubuntu-latest
