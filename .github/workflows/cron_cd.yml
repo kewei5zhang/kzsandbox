@@ -14,6 +14,7 @@ jobs:
       image_tag: ${{ steps.extract_image_tag.outputs.image_tag }}
       release_needed: ${{ steps.check_release.outputs.release_needed }}
       run_position: ${{ steps.run_position.outputs.run_position }}
+      next_deploy_msg: ${{ steps.run_position.outputs.next_deploy_msg }}
     steps:
       # Step 0: Checkout
       - name: Check Out The Repository
@@ -101,10 +102,14 @@ jobs:
             POSITION=2 # 12 PM PST
           elif [ "$HOUR" -eq 22 ]; then
             POSITION=3 # 2 PM PST
-          elif [ "$HOUR" -eq 0 ]; then
+          elif [ "$HOUR" -eq 3 ]; then
             POSITION=4 # 4 PM PST
           fi
           echo "run_position=${POSITION}" >> $GITHUB_OUTPUT
+          if [ $POSITION -lt 4 ]; then
+          echo "next_deploy_msg=The next deployment is scheduled in two hours." >> $GITHUB_OUTPUT
+          else
+          echo "next_deploy_msg=This is the last deployment for today." >> $GITHUB_OUTPUT
 
   release:
     needs: prepare
@@ -305,7 +310,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🎉 (${{ needs.prepare.outputs.run_position}}/4) Deployment Successfully ${{ needs.prepare.outputs.image_tag }}"
+                    "text": "🎉 (${{ needs.prepare.outputs.run_position }}/4) Deployment Successfully ${{ needs.prepare.outputs.image_tag }} ${{ needs.prepare.outputs.next_deploy_msg}}"
                   },
                   "accessory": {
                     "type": "button",
