@@ -13,6 +13,7 @@ jobs:
       job_id: ${{ steps.fetch_job_id.outputs.job_id }}
       image_tag: ${{ steps.extract_image_tag.outputs.image_tag }}
       release_needed: ${{ steps.check_release.outputs.release_needed }}
+      run_position: ${{ steps.run_position.outputs.run_position }}
     steps:
       # Step 0: Checkout
       - name: Check Out The Repository
@@ -88,6 +89,23 @@ jobs:
       #       echo "No new release needed" >> "$GITHUB_STEP_SUMMARY"
       #     fi
 
+      # Step 6: Calculate Run Position
+      - name: Calculate Run Position
+        id: run_position
+        run: |
+          HOUR=$(date +"%H")
+          POSITION=0
+          if [ "$HOUR" -eq 1 ]; then
+            POSITION=1 # 10 AM PST
+          elif [ "$HOUR" -eq 20 ]; then
+            POSITION=2 # 12 PM PST
+          elif [ "$HOUR" -eq 22 ]; then
+            POSITION=3 # 2 PM PST
+          elif [ "$HOUR" -eq 0 ]; then
+            POSITION=4 # 4 PM PST
+          fi
+          echo "run_position=${POSITION}" >> $GITHUB_OUTPUT
+
   release:
     needs: prepare
     runs-on: ubuntu-latest
@@ -128,13 +146,13 @@ jobs:
           channel-id: "C05QY3GP683" #deployment-notification-test
           payload: |
             {
-              "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins",
+              "text": "🕥 (${{ needs.prepare.outputs.run_position}}/4) Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🕥 Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
+                    "text": "🕥 (${{ needs.prepare.outputs.run_position}}/4) Deploying ${{ needs.prepare.outputs.image_tag }} in 5 mins"
                   }
                 },
                 {
@@ -215,7 +233,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🚀 Deploying ${{ needs.prepare.outputs.image_tag }} now"
+                    "text": "🚀 (${{ needs.prepare.outputs.run_position}}/4) Deploying ${{ needs.prepare.outputs.image_tag }} now"
                   },
                   "accessory": {
                     "type": "button",
@@ -287,7 +305,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🎉 Deployment Successfully ${{ needs.prepare.outputs.image_tag }}"
+                    "text": "🎉 (${{ needs.prepare.outputs.run_position}}/4) Deployment Successfully ${{ needs.prepare.outputs.image_tag }}"
                   },
                   "accessory": {
                     "type": "button",
@@ -319,7 +337,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🚨 Deployment Failed ${{ needs.prepare.outputs.image_tag }}"
+                    "text": "🚨 (${{ needs.prepare.outputs.run_position}}/4) Deployment Failed ${{ needs.prepare.outputs.image_tag }}"
                   },
                   "accessory": {
                     "type": "button",
@@ -351,7 +369,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "⏹️ Deployment Cancelled ${{ needs.prepare.outputs.image_tag }}. \n Release tag ${{ env.RELEASE_TAG }} is not created."
+                    "text": "⏹️ (${{ needs.prepare.outputs.run_position}}/4) Deployment Cancelled ${{ needs.prepare.outputs.image_tag }}. \n Release tag ${{ env.RELEASE_TAG }} is not created."
                   },
                   "accessory": {
                     "type": "button",
