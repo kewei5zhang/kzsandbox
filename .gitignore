@@ -36,7 +36,6 @@ keypair.json
 *.rdb
 .turbo
 ./tags
-*Dockerfile
 coverage/
 version.json
 
