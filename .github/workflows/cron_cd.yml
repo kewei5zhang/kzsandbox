@@ -296,13 +296,13 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/${{ github.repository }}/actions/runs/${{ needs.prepare.outputs.job_id }} | jq '.conclusion')
-          echo "JOB_CONCLUSION=${job_conclusion}" >> $GITHUB_ENV
+          echo "JOB_CONCLUSION=${job_conclusion}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
 
       - name: Send Slack notification - Success
         id: slack-success
-        if: env.JOB_CONCLUSION == 'success'
+        if: ${{ steps.check-deploys-all-job.outputs.JOB_CONCLUSION }} == 'success'
         uses: slackapi/slack-github-action@v1.24.0
         with:
           # channel-id: "C04KK1ZPQEN" #test-slack-integration
@@ -334,7 +334,7 @@ jobs:
 
       - name: Send Slack notification - Failure
         id: slack-failure
-        if: env.JOB_CONCLUSION == 'failure'
+        if: ${{ steps.check-deploys-all-job.outputs.JOB_CONCLUSION }} == 'failure'
         uses: slackapi/slack-github-action@v1.24.0
         with:
           # channel-id: "C04KK1ZPQEN" #test-slack-integration
