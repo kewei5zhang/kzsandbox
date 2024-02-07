@@ -299,6 +299,10 @@ jobs:
           echo "JOB_CONCLUSION=${job_conclusion}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
+      
+      - name: echo job conclusion
+        run: |
+          echo "job conclusion - ${{ steps.check-deploys-all-job.outputs.JOB_CONCLUSION }}"
 
       - name: Send Slack notification - Success
         id: slack-success
