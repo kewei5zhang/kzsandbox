@@ -95,7 +95,6 @@ jobs:
         id: run_position
         run: |
           # Determine the current hour
-          # Determine the current hour
           HOUR=$(date +"%H")
           POSITION=0
           # Map the current hour to the deployment schedule
@@ -112,14 +111,9 @@ jobs:
           echo "run_position=${POSITION}" >> $GITHUB_OUTPUT
           
           # Determine the message based on the run position
-          
-          # Determine the message based on the run position
           if [ $POSITION -lt 4 ]; then
             echo "next_deploy_msg=The next deployment is scheduled in two hours." >> $GITHUB_OUTPUT
-            echo "next_deploy_msg=The next deployment is scheduled in two hours." >> $GITHUB_OUTPUT
           else
-            echo "next_deploy_msg=This is the last deployment for today." >> $GITHUB_OUTPUT
-          fi
             echo "next_deploy_msg=This is the last deployment for today." >> $GITHUB_OUTPUT
           fi
 
